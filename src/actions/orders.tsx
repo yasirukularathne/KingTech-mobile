@@ -2,7 +2,7 @@
 
 import db from "@/db/db";
 import OrderHistoryEmail from "@/email/OrderHistory";
-import nodemailer from "nodemailer";
+import { sendEmail } from "@/lib/nodemailer";
 import { z } from "zod";
 
 const emailSchema = z.string().email();
@@ -46,30 +46,31 @@ export async function emailOrderHistory(
     };
   }
 
-  const orders = user.orders.map(async (order) => {
-    return {
-      ...order,
-      downloadVerificationId: (
-        await db.downloadVerification.create({
-          data: {
-            expiresAt: new Date(Date.now() + 24 * 1000 * 60 * 60),
-            productId: order.product.id,
-          },
-        })
-      ).id,
-    };
-  });
-
-  // Create Nodemailer transporter
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  const orders = user.orders.map(
+    async (order: {
+      pricePaidInCents: number;
+      id: string;
+      createdAt: Date;
+      product: {
+        id: string;
+        name: string;
+        imagePath: string;
+        description: string;
+      };
+    }) => {
+      return {
+        ...order,
+        downloadVerificationId: (
+          await db.downloadVerification.create({
+            data: {
+              expiresAt: new Date(Date.now() + 24 * 1000 * 60 * 60),
+              productId: order.product.id,
+            },
+          })
+        ).id,
+      };
+    }
+  );
 
   // Format prices as Sri Lankan Rupees (LKR)
   const formattedOrders = await Promise.all(orders);
@@ -98,8 +99,7 @@ export async function emailOrderHistory(
   );
 
   try {
-    await transporter.sendMail({
-      from: `Support <${process.env.SENDER_EMAIL}>`,
+    await sendEmail({
       to: user.email,
       subject: "Order History",
       html: emailHtml,
