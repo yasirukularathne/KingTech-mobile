@@ -73,12 +73,23 @@ export async function emailOrderHistory(
 
   // Format prices as Sri Lankan Rupees (LKR)
   const formattedOrders = await Promise.all(orders);
-  formattedOrders.forEach((order) => {
-    order.pricePaidInCentsLKR = new Intl.NumberFormat("en-LK", {
-      style: "currency",
-      currency: "LKR",
-    }).format(order.pricePaidInCents / 100);
-  });
+  type Product = {
+    id: string;
+    name: string;
+    imagePath: string;
+    description: string;
+  };
+
+  type Order = {
+    id: string;
+    pricePaidInCents: number;
+    createdAt: Date;
+    product: Product;
+    downloadVerificationId?: string;
+    pricePaidInCentsLKR?: string;
+  };
+
+  // ...existing code...
 
   // Render the email HTML using React
   const ReactDOMServer = (await import("react-dom/server")).default;
