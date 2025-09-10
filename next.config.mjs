@@ -5,15 +5,8 @@ const nextConfig = {
       ...config.resolve.fallback,
       fs: false,
     };
-    
-    config.externals = {
-      ...config.externals,
-      'html-to-text': 'html-to-text'
-    };
-    
     return config;
   },
-  transpilePackages: ['html-to-text']
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
