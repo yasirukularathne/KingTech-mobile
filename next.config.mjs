@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["html-to-text", "entities"],
-};
+  transpilePackages: ['html-to-text'],
+  experimental: {
+    esmExternals: 'loose'
+  }
+}
 
-export default nextConfig;
+module.exports = nextConfig
