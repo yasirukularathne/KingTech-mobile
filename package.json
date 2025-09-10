@@ -19,6 +19,8 @@
     "@stripe/stripe-js": "^3.0.6",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "entities": "^3.0.1",
+    "html-to-text": "^8.2.1",
     "lucide-react": "^0.341.0",
     "next": "^14.1.0",
     "nodemailer": "^7.0.6",
@@ -46,5 +48,14 @@
     "tailwindcss": "^3.3.0",
     "ts-node": "^10.9.2",
     "typescript": "^5"
+  },
+  "resolutions": {
+    "html-to-text/entities": "^3.0.1",
+    "entities": "^3.0.1"
+  },
+  "overrides": {
+    "html-to-text": {
+      "entities": "^3.0.1"
+    }
   }
 }
