@@ -1,6 +1,5 @@
 "use client";
 
-import { userOrderExists } from "@/app/actions/orders";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,15 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/lib/formatters";
-import {
-  Elements,
-  LinkAuthenticationElement,
-  PaymentElement,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { ShieldCheck, BadgeCheck, Lock } from "lucide-react";
@@ -31,12 +24,7 @@ type CheckoutFormProps = {
     priceInCents: number;
     description: string;
   };
-  clientSecret: string;
 };
-
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
-);
 
 function AssuranceCards() {
   const items = [
@@ -53,7 +41,7 @@ function AssuranceCards() {
     {
       icon: Lock,
       title: "Safe Checkout",
-      desc: "Stripe powered • PCI compliant • No card data stored here.",
+      desc: "Secure payment processing • No card data stored here.",
     },
   ];
   return (
@@ -81,7 +69,7 @@ function AssuranceCards() {
   );
 }
 
-export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
+export function CheckoutForm({ product }: CheckoutFormProps) {
   return (
     <div className="max-w-5xl w-full mx-auto space-y-8">
       <div className="flex gap-4 items-center">
@@ -104,9 +92,7 @@ export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
         </div>
       </div>
       <AssuranceCards />
-      <Elements options={{ clientSecret }} stripe={stripePromise}>
-        <Form priceInCents={product.priceInCents} productId={product.id} />
-      </Elements>
+      <Form priceInCents={product.priceInCents} productId={product.id} />
     </div>
   );
 }
@@ -118,44 +104,37 @@ function Form({
   priceInCents: number;
   productId: string;
 }) {
-  const stripe = useStripe();
-  const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>();
-  const [email, setEmail] = useState<string>();
+  const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
-    if (stripe == null || elements == null || email == null) return;
-
-    setIsLoading(true);
-
-    const orderExists = await userOrderExists(email, productId);
-
-    if (orderExists) {
-      setErrorMessage(
-        "You have already purchased this product. Try downloading it from the My Orders page"
-      );
-      setIsLoading(false);
+    if (!email || !name) {
+      setErrorMessage("Please fill in all required fields");
       return;
     }
 
-    stripe
-      .confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/stripe/purchase-success`,
-        },
-      })
-      .then(({ error }) => {
-        if (error.type === "card_error" || error.type === "validation_error") {
-          setErrorMessage(error.message);
-        } else {
-          setErrorMessage("An unknown error occurred");
-        }
-      })
-      .finally(() => setIsLoading(false));
+    setIsLoading(true);
+    setErrorMessage(undefined);
+
+    try {
+      // Here you can implement your own payment processing logic
+      // For now, we'll just simulate a purchase
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Redirect to success page or show success message
+      alert(
+        "Purchase successful! You will receive your download link via email."
+      );
+    } catch (error) {
+      setErrorMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -163,29 +142,71 @@ function Form({
       <Card>
         <CardHeader>
           <CardTitle>Checkout</CardTitle>
+          <CardDescription>
+            Complete your purchase to get instant access to your digital
+            product.
+          </CardDescription>
           {errorMessage && (
             <CardDescription className="text-destructive">
               {errorMessage}
             </CardDescription>
           )}
         </CardHeader>
-        <CardContent>
-          <PaymentElement />
-          <div className="mt-4">
-            <LinkAuthenticationElement
-              onChange={(e) => setEmail(e.value.email)}
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email Address *</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="name">Full Name *</Label>
+            <Input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="John Doe"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone Number (Optional)</Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+1 (555) 123-4567"
+            />
+          </div>
+
+          <div className="pt-4 border-t">
+            <p className="text-sm text-gray-600">
+              By completing this purchase, you agree to our terms of service and
+              privacy policy.
+            </p>
           </div>
         </CardContent>
         <CardFooter>
           <Button
             className="w-full"
             size="lg"
-            disabled={stripe == null || elements == null || isLoading}
+            disabled={isLoading}
+            type="submit"
           >
             {isLoading
-              ? "Purchasing..."
-              : `Purchase - ${formatCurrency(Math.round(priceInCents / 100))}`}
+              ? "Processing..."
+              : `Complete Purchase - ${formatCurrency(
+                  Math.round(priceInCents / 100)
+                )}`}
           </Button>
         </CardFooter>
       </Card>

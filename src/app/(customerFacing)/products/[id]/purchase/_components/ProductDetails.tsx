@@ -64,6 +64,9 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               >
                 Purchase Now
               </Button>
+              <p className="text-sm text-center text-gray-500">
+                Demo mode: payment flow simplified
+              </p>
             </div>
           </CardContent>
         </Card>
