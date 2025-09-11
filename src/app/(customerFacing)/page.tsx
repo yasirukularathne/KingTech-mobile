@@ -317,7 +317,7 @@ export default async function HomePage() {
 type ProductGridSectionProps = {
   title: string;
   subtitle?: string;
-  productsFetcher: () => Promise<Product[]>;
+  productsFetcher: () => Promise<(Product & { _count: { orders: number } })[]>;
   viewAllHref?: string;
 };
 
@@ -364,9 +364,11 @@ function ProductGridSection({
 async function ProductSuspense({
   productsFetcher,
 }: {
-  productsFetcher: () => Promise<Product[]>;
+  productsFetcher: () => Promise<(Product & { _count: { orders: number } })[]>;
 }) {
-  return (await productsFetcher()).map((product) => (
+  return (
+    await productsFetcher()
+  ).map((product: Product & { _count: { orders: number } }) => (
     <ProductCard key={product.id} {...product} />
   ));
 }
