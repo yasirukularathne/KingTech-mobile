@@ -20,7 +20,6 @@
     "cheerio": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "entities": "^3.0.1",
     "htmlparser2": "^10.0.0",
     "lucide-react": "^0.341.0",
     "next": "^14.1.0",
@@ -49,14 +48,5 @@
     "tailwindcss": "^3.3.0",
     "ts-node": "^10.9.2",
     "typescript": "^5"
-  },
-  "resolutions": {
-    "html-to-text/entities": "^3.0.1",
-    "entities": "^3.0.1"
-  },
-  "overrides": {
-    "html-to-text": {
-      "entities": "^3.0.1"
-    }
   }
 }
