@@ -63,36 +63,42 @@ const categories = [
     icon: Smartphone,
     color: "bg-blue-500",
     description: "Latest smartphones and accessories",
+    brands: ["Apple", "Samsung", "Google", "OnePlus", "Xiaomi"],
   },
   {
     name: "TVs",
     icon: Tv,
     color: "bg-purple-500",
     description: "Smart TVs and entertainment systems",
+    brands: ["Samsung", "LG", "Sony", "TCL", "Hisense"],
   },
   {
     name: "Laptops",
     icon: Laptop,
     color: "bg-green-500",
     description: "Powerful laptops for work and gaming",
+    brands: ["Apple", "Dell", "HP", "Lenovo", "ASUS"],
   },
   {
     name: "Audio",
     icon: Headphones,
     color: "bg-red-500",
     description: "Headphones, speakers, and audio gear",
+    brands: ["Sony", "Bose", "Apple", "Sennheiser", "JBL"],
   },
   {
     name: "Gaming",
     icon: Camera,
     color: "bg-orange-500",
     description: "Gaming consoles and accessories",
+    brands: ["PlayStation", "Xbox", "Nintendo", "Razer", "Logitech"],
   },
   {
     name: "Accessories",
     icon: Watch,
     color: "bg-teal-500",
     description: "Tech accessories and gadgets",
+    brands: ["Apple", "Anker", "Belkin", "Samsung", "Logitech"],
   },
 ];
 
@@ -238,9 +244,25 @@ export default async function HomePage() {
                         </p>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 leading-relaxed flex-grow relative">
+                    <p className="text-sm text-gray-600 leading-relaxed flex-grow relative mb-4">
                       {category.description}
                     </p>
+                    {/* Brand names */}
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {category.brands.slice(0, 4).map((brand, idx) => (
+                        <span
+                          key={brand}
+                          className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 border border-indigo-200/50"
+                        >
+                          {brand}
+                        </span>
+                      ))}
+                      {category.brands.length > 4 && (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                          +{category.brands.length - 4} more
+                        </span>
+                      )}
+                    </div>
                     {/* Progress indicator */}
                     <div className="mt-6 relative">
                       <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
