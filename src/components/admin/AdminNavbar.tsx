@@ -14,8 +14,6 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/users", label: "Customers", icon: Users },
-  { href: "/admin/orders", label: "Sales", icon: ShoppingCart },
 ];
 
 export function AdminNavbar() {
@@ -27,7 +25,20 @@ export function AdminNavbar() {
         aria-hidden
         className="absolute -inset-x-4 -bottom-6 top-0 -z-10 backdrop-blur-2xl bg-white/40 [mask-image:linear-gradient(to_bottom,black,70%,transparent)]"
       />
-      <nav className="flex items-center gap-2 overflow-x-auto scrollbar-none rounded-2xl bg-white/60 backdrop-blur-xl px-4 py-2 ring-1 ring-gray-200/60 shadow-lg relative">
+      <nav className="flex items-center gap-4 overflow-x-auto scrollbar-none rounded-2xl bg-white/60 backdrop-blur-xl px-5 py-1.5 ring-1 ring-gray-200/60 shadow-lg relative">
+        <div className="flex items-center gap-3 pr-4 mr-2 border-r border-gray-200/60">
+          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 flex items-center justify-center shadow ring-2 ring-white/60">
+            <LayoutDashboard className="h-5 w-5 text-white drop-shadow" />
+          </div>
+          <div className="flex flex-col leading-tight">
+            <span className="text-lg font-semibold tracking-tight text-gray-900">
+              Control Center
+            </span>
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
+              Operations Suite
+            </span>
+          </div>
+        </div>
         {links.map((l) => {
           const active = pathname === l.href;
           const Icon = l.icon;

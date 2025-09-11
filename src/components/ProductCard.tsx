@@ -39,8 +39,8 @@ export function ProductCard(props: ProductCardProps) {
   return (
     <Card
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-white/70 backdrop-blur transition shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300",
-        "before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-white/10"
+        "group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-white/80 backdrop-blur transition shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300",
+        "before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/50 before:to-white/10"
       )}
     >
       <div className="relative w-full aspect-[4/3] overflow-hidden">
@@ -52,7 +52,7 @@ export function ProductCard(props: ProductCardProps) {
           className="object-cover"
           priority={isPopular || isNew}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-950/40 via-gray-900/0 to-transparent opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-transparent" />
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           <span className="text-[11px] tracking-wide font-medium px-2 py-1 rounded-full bg-white/90 shadow-sm text-gray-700">
             {category}
@@ -81,18 +81,18 @@ export function ProductCard(props: ProductCardProps) {
             New
           </span>
         </div>
-        <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-4">
-          <div className="space-y-1">
-            <h3 className="text-white font-semibold leading-tight drop-shadow line-clamp-1">
-              {name}
-            </h3>
-            <p className="text-amber-300 font-bold text-sm drop-shadow">
-              {formatCurrency(priceInCents / 100)}
-            </p>
-          </div>
-        </div>
       </div>
       <CardContent className="pt-4 pb-0 px-5 flex-grow flex flex-col">
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <h3 className="text-base font-semibold text-gray-900 leading-snug line-clamp-2 flex-1">
+            {name}
+          </h3>
+          <div className="shrink-0 -mt-0.5 text-right">
+            <span className="inline-block rounded-md bg-indigo-50 px-2 py-1 text-[13px] font-semibold text-indigo-700 shadow-sm ring-1 ring-indigo-200">
+              {formatCurrency(Math.round(priceInCents / 100))}
+            </span>
+          </div>
+        </div>
         <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 flex-grow">
           {description}
         </p>

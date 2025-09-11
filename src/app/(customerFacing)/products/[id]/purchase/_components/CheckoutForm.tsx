@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { userOrderExists } from "@/app/actions/orders"
-import { Button } from "@/components/ui/button"
+import { userOrderExists } from "@/app/actions/orders";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,33 +9,77 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { formatCurrency } from "@/lib/formatters"
+} from "@/components/ui/card";
+import { formatCurrency } from "@/lib/formatters";
 import {
   Elements,
   LinkAuthenticationElement,
   PaymentElement,
   useElements,
   useStripe,
-} from "@stripe/react-stripe-js"
-import { loadStripe } from "@stripe/stripe-js"
-import Image from "next/image"
-import { FormEvent, useState } from "react"
+} from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import Image from "next/image";
+import { FormEvent, useState } from "react";
+import { ShieldCheck, BadgeCheck, Lock } from "lucide-react";
 
 type CheckoutFormProps = {
   product: {
-    id: string
-    imagePath: string
-    name: string
-    priceInCents: number
-    description: string
-  }
-  clientSecret: string
-}
+    id: string;
+    imagePath: string;
+    name: string;
+    priceInCents: number;
+    description: string;
+  };
+  clientSecret: string;
+};
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
-)
+);
+
+function AssuranceCards() {
+  const items = [
+    {
+      icon: ShieldCheck,
+      title: "Secure Encryption",
+      desc: "256-bit SSL protects your payment details end-to-end.",
+    },
+    {
+      icon: BadgeCheck,
+      title: "Genuine Warranty",
+      desc: "Official product warranty & verified authenticity.",
+    },
+    {
+      icon: Lock,
+      title: "Safe Checkout",
+      desc: "Stripe powered • PCI compliant • No card data stored here.",
+    },
+  ];
+  return (
+    <div className="grid gap-4 sm:grid-cols-3">
+      {items.map(({ icon: Icon, title, desc }) => (
+        <div
+          key={title}
+          className="relative overflow-hidden rounded-xl border border-indigo-100/60 bg-white/70 backdrop-blur-md p-4 flex flex-col gap-2 shadow-sm hover:shadow-md transition"
+        >
+          <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat mix-blend-multiply" />
+          <div className="relative flex items-center gap-3">
+            <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-indigo-600/10 text-indigo-600 ring-1 ring-indigo-200">
+              <Icon className="h-5 w-5" />
+            </div>
+            <h4 className="font-semibold text-sm text-gray-900 tracking-tight">
+              {title}
+            </h4>
+          </div>
+          <p className="relative text-xs leading-relaxed text-gray-600 pr-1">
+            {desc}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
   return (
@@ -50,8 +94,8 @@ export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
           />
         </div>
         <div>
-          <div className="text-lg">
-            {formatCurrency(product.priceInCents / 100)}
+          <div className="text-lg font-bold text-indigo-500">
+            {formatCurrency(Math.round(product.priceInCents / 100))}
           </div>
           <h1 className="text-2xl font-bold">{product.name}</h1>
           <div className="line-clamp-3 text-muted-foreground">
@@ -59,41 +103,42 @@ export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
           </div>
         </div>
       </div>
+      <AssuranceCards />
       <Elements options={{ clientSecret }} stripe={stripePromise}>
         <Form priceInCents={product.priceInCents} productId={product.id} />
       </Elements>
     </div>
-  )
+  );
 }
 
 function Form({
   priceInCents,
   productId,
 }: {
-  priceInCents: number
-  productId: string
+  priceInCents: number;
+  productId: string;
 }) {
-  const stripe = useStripe()
-  const elements = useElements()
-  const [isLoading, setIsLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string>()
-  const [email, setEmail] = useState<string>()
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>();
+  const [email, setEmail] = useState<string>();
 
   async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (stripe == null || elements == null || email == null) return
+    if (stripe == null || elements == null || email == null) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
 
-    const orderExists = await userOrderExists(email, productId)
+    const orderExists = await userOrderExists(email, productId);
 
     if (orderExists) {
       setErrorMessage(
         "You have already purchased this product. Try downloading it from the My Orders page"
-      )
-      setIsLoading(false)
-      return
+      );
+      setIsLoading(false);
+      return;
     }
 
     stripe
@@ -105,12 +150,12 @@ function Form({
       })
       .then(({ error }) => {
         if (error.type === "card_error" || error.type === "validation_error") {
-          setErrorMessage(error.message)
+          setErrorMessage(error.message);
         } else {
-          setErrorMessage("An unknown error occurred")
+          setErrorMessage("An unknown error occurred");
         }
       })
-      .finally(() => setIsLoading(false))
+      .finally(() => setIsLoading(false));
   }
 
   return (
@@ -128,7 +173,7 @@ function Form({
           <PaymentElement />
           <div className="mt-4">
             <LinkAuthenticationElement
-              onChange={e => setEmail(e.value.email)}
+              onChange={(e) => setEmail(e.value.email)}
             />
           </div>
         </CardContent>
@@ -140,10 +185,10 @@ function Form({
           >
             {isLoading
               ? "Purchasing..."
-              : `Purchase - ${formatCurrency(priceInCents / 100)}`}
+              : `Purchase - ${formatCurrency(Math.round(priceInCents / 100))}`}
           </Button>
         </CardFooter>
       </Card>
     </form>
-  )
+  );
 }

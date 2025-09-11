@@ -39,8 +39,8 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             <div className="flex justify-between items-start">
               <div>
                 <CardTitle className="text-2xl">{product.name}</CardTitle>
-                <CardDescription className="text-xl font-semibold text-primary">
-                  {formatCurrency(product.priceInCents / 100)}
+                <CardDescription className="text-xl font-extrabold text-indigo-400">
+                  {formatCurrency(Math.round(product.priceInCents / 100))}
                 </CardDescription>
               </div>
               <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
@@ -58,12 +58,12 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             </div>
 
             <div className="space-y-4">
-              <Button size="lg" className="w-full" disabled>
-                Contact for Purchase
+              <Button
+                size="lg"
+                className="w-full bg-indigo-600 hover:bg-indigo-500"
+              >
+                Purchase Now
               </Button>
-              <p className="text-sm text-center text-gray-500">
-                Payment functionality removed - This is a product showcase
-              </p>
             </div>
           </CardContent>
         </Card>

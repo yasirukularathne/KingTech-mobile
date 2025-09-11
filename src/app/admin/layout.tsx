@@ -9,7 +9,7 @@ export default function AdminLayout({
 }>) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-200">
-      <header className="sticky top-0 z-50 w-full px-4 sm:px-6 lg:px-8 pt-6 relative overflow-visible">
+      <header className="sticky top-0 z-50 w-full px-4 sm:px-6 lg:px-8 pt-3 relative overflow-visible">
         {/* Blur / conceal overlay so underlying content isn't visible while scrolling */}
         <div
           aria-hidden
@@ -18,17 +18,7 @@ export default function AdminLayout({
         <div className="max-w-7xl mx-auto flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 flex items-center justify-center text-white shadow-lg ring-2 ring-white/40">
-                <span className="font-bold text-sm tracking-wide">ADMIN</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-lg font-semibold tracking-tight text-gray-900">
-                  Control Center
-                </span>
-                <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Operations Suite
-                </span>
-              </div>
+              <div className="flex flex-col"></div>
             </div>
           </div>
           <AdminNavbar />
