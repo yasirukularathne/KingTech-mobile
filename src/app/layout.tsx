@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { SessionProvider } from "next-auth/react";
+import { FooterConditional } from "@/components/FooterConditional";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -20,11 +21,12 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          "bg-background min-h-screen font-sans antialiased",
+          "bg-background min-h-screen font-sans antialiased flex flex-col",
           inter.variable
         )}
       >
-        {children}
+        <div className="flex-1 flex flex-col">{children}</div>
+        <FooterConditional />
       </body>
     </html>
   );

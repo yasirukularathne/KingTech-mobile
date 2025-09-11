@@ -1,6 +1,10 @@
 import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Hero } from "@/components/home/Hero";
+import { TrustBar } from "@/components/home/TrustBar";
+import { Features } from "@/components/home/Features";
+import { Testimonials } from "@/components/home/Testimonials";
 import db from "@/db/db";
 import { cache } from "@/lib/cache";
 import { Product } from "@prisma/client";
@@ -22,6 +26,7 @@ const getMostPopularProducts = cache(
       where: { isAvailableForPurchase: true },
       orderBy: { orders: { _count: "desc" } },
       take: 6,
+      include: { _count: { select: { orders: true } } },
     });
   },
   ["/", "getMostPopularProducts"],
@@ -33,6 +38,7 @@ const getNewestProducts = cache(() => {
     where: { isAvailableForPurchase: true },
     orderBy: { createdAt: "desc" },
     take: 4,
+    include: { _count: { select: { orders: true } } },
   });
 }, ["/", "getNewestProducts"]);
 
@@ -45,6 +51,7 @@ const getProductsByCategory = cache(
       },
       orderBy: { createdAt: "desc" },
       take: 4,
+      include: { _count: { select: { orders: true } } },
     });
   },
   ["/", "getProductsByCategory"]
@@ -89,109 +96,28 @@ const categories = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Enrich categories with live product counts (parallelized)
+  const categoryStats = await Promise.all(
+    categories.map(async (c) => {
+      const count = await db.product.count({
+        where: { isAvailableForPurchase: true, category: c.name },
+      });
+      return { ...c, count };
+    })
+  );
+  const maxCategoryCount = Math.max(
+    1,
+    ...categoryStats.map((c) => c.count || 0)
+  );
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white rounded-3xl shadow-2xl mx-4 mt-8 mb-16 backdrop-blur-lg">
-        <div className="container mx-auto px-4 py-16 lg:py-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h1 className="text-4xl lg:text-6xl font-extrabold leading-tight drop-shadow-lg">
-                Latest Tech
-                <span className="block text-yellow-300">
-                  At Your Fingertips
-                </span>
-              </h1>
-              <p className="text-xl text-blue-100 max-w-lg">
-                Discover the newest smartphones, laptops, TVs, and accessories
-                from top brands. Quality guaranteed with fast delivery.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold shadow-lg"
-                >
-                  <Link href="/products">Shop Now</Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="lg"
-                  className="text-white border-white hover:bg-white hover:text-blue-600 shadow-lg"
-                >
-                  <Link href="/products?category=Phones">Latest Phones</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="hidden lg:block">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-pink-500 rounded-3xl transform rotate-3 blur-sm"></div>
-                <div className="relative bg-white/80 backdrop-blur-lg rounded-3xl p-8 text-black shadow-xl">
-                  <h3 className="text-2xl font-bold mb-4">Featured Deal</h3>
-                  <p className="text-gray-600 mb-4">
-                    Up to 30% off on selected electronics
-                  </p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 shadow-lg">
-                    View Deals
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Grid */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="rounded-3xl shadow-xl bg-white/70 backdrop-blur-lg border-0 p-8 mb-12">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                Shop by Category
-              </h2>
-              <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                Find exactly what you're looking for in our carefully curated
-                categories
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {categories.map((category) => (
-                <Link
-                  key={category.name}
-                  href={`/products?category=${category.name}`}
-                  className="block"
-                >
-                  <Card className="group rounded-3xl shadow-lg border-0 overflow-hidden bg-white/60 backdrop-blur-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-                    <CardContent className="p-0">
-                      <div className="relative flex flex-col items-center justify-center p-8">
-                        <div
-                          className={`absolute inset-0 ${category.color} opacity-30 pointer-events-none rounded-3xl`}
-                        />
-                        <category.icon className="relative h-12 w-12 mb-4 text-gray-900 group-hover:scale-110 transition-transform drop-shadow-lg" />
-                        <h3 className="relative text-xl font-bold text-gray-900 mb-2 tracking-wide text-center">
-                          {category.name}
-                        </h3>
-                        <p className="relative text-gray-700/90 mb-4 text-center text-sm">
-                          {category.description}
-                        </p>
-                        <div className="relative flex items-center justify-center text-gray-900 group-hover:translate-x-2 transition-transform">
-                          <span className="font-semibold">Explore</span>
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* New Arrivals */}
-      <section className="py-16">
+    <main className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+      <div className="px-4 lg:px-8 pt-8">
+        <Hero />
+      </div>
+      {/* New Arrivals (moved up just after hero per request) */}
+      <section className="pt-10 pb-8">
         <div className="container mx-auto px-4">
           <ProductGridSection
             title="New Arrivals"
@@ -201,9 +127,8 @@ export default function HomePage() {
           />
         </div>
       </section>
-
-      {/* Popular Products */}
-      <section className="py-16 bg-gray-50">
+      {/* Most Popular Products (moved directly after New Arrivals) */}
+      <section className="py-8 bg-gray-50">
         <div className="container mx-auto px-4">
           <ProductGridSection
             title="Most Popular"
@@ -213,9 +138,8 @@ export default function HomePage() {
           />
         </div>
       </section>
-
-      {/* Brand Showcase */}
-      <section className="py-16">
+      {/* Brand Showcase (moved up) */}
+      <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
@@ -232,9 +156,121 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      <TrustBar />
+      <Features />
+
+      {/* Categories Grid (reduced top spacing) */}
+      <section className="pt-10 pb-20 relative">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-indigo-50/40 to-transparent" />
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-14">
+            <div className="max-w-xl space-y-4">
+              <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-gray-900">
+                Shop by Category
+              </h2>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                Curated product families built around performance, creativity &
+                entertainment.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {categoryStats.map((c, idx) => {
+                const pct = Math.round(
+                  ((c.count || 0) / (maxCategoryCount || 1)) * 100
+                );
+                return (
+                  <span
+                    key={c.name + "-badge"}
+                    className="group relative overflow-hidden px-4 py-2 rounded-full bg-white/70 backdrop-blur border border-gray-200/70 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-xs font-medium tracking-wide text-gray-700"
+                  >
+                    {/* Decorative gradient aura */}
+                    <span
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        background:
+                          "radial-gradient(circle at 30% 30%, rgba(99,102,241,0.18), transparent 70%)",
+                      }}
+                    />
+                    {/* Colored dot */}
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 ring-2 ring-white/60 shadow" />
+                    <span className="relative capitalize">{c.name}</span>
+                    <span className="relative text-gray-400">• {c.count}</span>
+                    {/* Mini progress bar */}
+                    <span className="relative ml-1 h-2 w-16 rounded-full bg-gray-200/70 overflow-hidden">
+                      <span
+                        className="absolute left-0 top-0 h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 transition-all duration-500"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </span>
+                    <span className="relative text-[10px] text-gray-400 font-semibold tabular-nums">
+                      {pct}%
+                    </span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {categoryStats.map((category) => {
+              const pct = Math.round((category.count / maxCategoryCount) * 100);
+              return (
+                <Link
+                  key={category.name}
+                  href={`/products?category=${category.name}`}
+                  className="group relative"
+                >
+                  <div className="relative h-full overflow-hidden rounded-3xl border border-gray-200/60 bg-white/70 backdrop-blur shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col p-8">
+                    {/* Accent gradient bar */}
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500" />
+                    {/* Soft radial highlight */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.15),transparent_70%)]" />
+                    <div className="flex items-center gap-4 mb-6 relative">
+                      <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 text-white shadow-lg ring-4 ring-white/40">
+                        <category.icon className="h-7 w-7 drop-shadow" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold tracking-tight text-gray-900">
+                          {category.name}
+                        </h3>
+                        <p className="text-xs uppercase tracking-wide text-gray-500 font-medium">
+                          {category.count}{" "}
+                          {category.count === 1 ? "Product" : "Products"}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-600 leading-relaxed flex-grow relative">
+                      {category.description}
+                    </p>
+                    {/* Progress indicator */}
+                    <div className="mt-6 relative">
+                      <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <div className="mt-2 flex items-center justify-between text-[11px] font-medium text-gray-500 uppercase tracking-wide">
+                        <span>Inventory</span>
+                        <span>{pct}%</span>
+                      </div>
+                    </div>
+                    <div className="mt-8 flex items-center gap-2 text-sm font-medium text-indigo-600 group-hover:text-indigo-700 relative">
+                      Explore
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
+                    <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-gray-900/5 group-hover:ring-indigo-300/40" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <Testimonials />
 
       {/* Call to Action */}
-      <section className="bg-gray-900 text-white py-16">
+      <section className="bg-gray-900 text-white py-14 pb-10">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4">
             Ready to Upgrade Your Tech?
