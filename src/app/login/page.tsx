@@ -4,6 +4,9 @@ import { signIn, useSession } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+// Disable static generation for this page since it uses client-side hooks
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
   const { data: session, status } = useSession();
   const params = useSearchParams();
@@ -18,6 +21,18 @@ export default function LoginPage() {
 
   const error = params?.get("error");
   const unauthorized = error === "AccessDenied" || error === "Callback";
+
+  // Show loading state during initial render to prevent hydration issues
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
+        <div className="flex items-center gap-3">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+          <span>Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen w-full flex bg-gray-950 text-white overflow-hidden">
@@ -90,7 +105,7 @@ export default function LoginPage() {
           <form
             onSubmit={async (e) => {
               e.preventDefault();
-              if (submitting || status === "loading") return;
+              if (submitting) return;
               setSubmitting(true);
               await signIn("google");
               setSubmitting(false);
@@ -99,7 +114,7 @@ export default function LoginPage() {
           >
             <button
               type="submit"
-              disabled={submitting || status === "loading"}
+              disabled={submitting}
               className="group relative w-full overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 px-6 py-4 text-sm font-semibold tracking-wide text-white shadow-lg transition-all hover:shadow-indigo-500/30 disabled:opacity-60"
             >
               <span className="relative z-10 flex items-center justify-center gap-3">
