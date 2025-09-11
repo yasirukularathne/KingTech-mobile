@@ -10,7 +10,6 @@
     "email": "cp .env ./node_modules/react-email && email dev --dir src/email --port 3001"
   },
   "dependencies": {
-    "@next-auth/mongodb-adapter": "^1.1.3",
     "@prisma/client": "^6.15.0",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-label": "^2.0.2",
@@ -22,7 +21,6 @@
     "entities": "^4.4.0",
     "html-to-text": "^8.2.0",
     "lucide-react": "^0.341.0",
-    "mongodb": "^6.19.0",
     "next": "^14.1.0",
     "next-auth": "^4.24.11",
     "nodemailer": "^7.0.6",
