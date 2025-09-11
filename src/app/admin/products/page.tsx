@@ -1,149 +1,192 @@
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "../_components/PageHeader";
 import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import db from "@/db/db";
-import { CheckCircle2, MoreVertical, XCircle } from "lucide-react";
-import { formatCurrency, formatNumber } from "@/lib/formatters";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  ActiveToggleDropdownItem,
-  DeleteDropdownItem,
-} from "./_components/ProductActions";
+  CheckCircle2,
+  XCircle,
+  Search,
+  Filter,
+  PackagePlus,
+  ArrowUpDown,
+} from "lucide-react";
+import { formatCurrency } from "@/lib/formatters";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { redirect } from "next/navigation";
+// Dropdown product actions removed (three-dots menu eliminated)
+import { GlassStatusToggle } from "./_components/GlassStatusToggle";
+import { CategoryIcon } from "./_components/CategoryIcon";
+import { InlineDeleteButton } from "./_components/InlineDeleteButton";
+import { Suspense } from "react";
+// Dropdown menu components no longer needed after removal of three-dots menu
 
-export default function AdminProductsPage() {
+export default async function AdminProductsPage() {
+  const session = await getServerSession(authOptions);
+  const adminEmails = ["yasirukularathne1234@gmail.com"];
+  const email = session?.user?.email ?? "";
+  if (!session || !email || !adminEmails.includes(email)) {
+    redirect("/login");
+  }
+
   return (
-    <div className="min-h-screen py-10 bg-gradient-to-br from-white via-gray-50 to-gray-100">
-      <div className="container mx-auto px-4">
-        <div className="rounded-3xl shadow-xl bg-white/70 backdrop-blur-lg border-0 p-8 mb-8">
-          <div className="flex justify-between items-center gap-4 mb-6">
+    <div className="min-h-screen py-6 bg-gradient-to-br from-white via-gray-50 to-gray-100">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-2">
             <PageHeader>Products</PageHeader>
-            <Button
-              asChild
-              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold shadow hover:from-blue-600 hover:to-purple-600"
-            >
-              <Link href="/admin/products/new">Add Product</Link>
+            <p className="text-sm text-gray-500">
+              Manage your catalog, availability and pricing.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button asChild size="sm" variant="glass" className="gap-2">
+              <Link href="/admin/products/new">
+                <span className="inline-flex items-center justify-center rounded-md p-1.5 bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 shadow-sm">
+                  <PackagePlus className="h-3.5 w-3.5 text-white" />
+                </span>
+                <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent font-semibold">
+                  New Product
+                </span>
+              </Link>
             </Button>
           </div>
-          <ProductsTable />
+        </div>
+        <Toolbar />
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <Suspense
+            fallback={
+              <p className="text-sm text-gray-400">Loading products...</p>
+            }
+          >
+            <ProductsGrid />
+          </Suspense>
         </div>
       </div>
     </div>
   );
 }
 
-async function ProductsTable() {
+async function ProductsGrid() {
   const products = await db.product.findMany({
     select: {
       id: true,
       name: true,
+      category: true,
       priceInCents: true,
       isAvailableForPurchase: true,
       _count: { select: { orders: true } },
     },
-    orderBy: { name: "asc" },
+    orderBy: { updatedAt: "desc" },
   });
-
-  if (products.length === 0) return <p>No products found</p>;
-
+  if (products.length === 0)
+    return (
+      <p className="text-sm text-gray-500 col-span-full">No products found</p>
+    );
   return (
-    <Table className="rounded-2xl overflow-hidden shadow-lg bg-white/80">
-      <TableHeader className="bg-gradient-to-r from-blue-100 to-purple-100">
-        <TableRow>
-          <TableHead className="w-0 text-center">Status</TableHead>
-          <TableHead className="text-lg font-bold text-gray-900">
-            Name
-          </TableHead>
-          <TableHead className="text-lg font-bold text-gray-900">
-            Price
-          </TableHead>
-          <TableHead className="text-lg font-bold text-gray-900">
-            Orders
-          </TableHead>
-          <TableHead className="w-0 text-center">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {products.map((product) => {
-          const isValuable = product.isAvailableForPurchase;
-          return (
-            <TableRow
-              key={product.id}
-              className={
-                isValuable
-                  ? "bg-green-50/60 hover:bg-green-100 transition-colors"
-                  : "bg-red-50/60 hover:bg-red-100 transition-colors"
-              }
-            >
-              <TableCell className="text-center">
-                {isValuable ? (
-                  <span className="inline-flex items-center justify-center bg-green-100 text-green-700 p-2 rounded-full">
-                    <CheckCircle2 className="h-5 w-5" />
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center justify-center bg-red-100 text-red-700 p-2 rounded-full">
-                    <XCircle className="h-5 w-5" />
-                  </span>
-                )}
-              </TableCell>
-              <TableCell className="font-medium text-gray-900">
-                {product.name}
-              </TableCell>
-              <TableCell className="font-semibold text-blue-600">
-                {formatCurrency(product.priceInCents / 100)}
-              </TableCell>
-              <TableCell className="font-semibold text-purple-600">
-                {formatNumber(product._count.orders)}
-              </TableCell>
-              <TableCell className="text-center">
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <MoreVertical />
-                    <span className="sr-only">Actions</span>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem asChild>
-                      <a
-                        download
-                        href={`/admin/products/${product.id}/download`}
-                      >
-                        Download
-                      </a>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href={`/admin/products/${product.id}/edit`}>
-                        Edit
-                      </Link>
-                    </DropdownMenuItem>
-                    <ActiveToggleDropdownItem
-                      id={product.id}
-                      isAvailableForPurchase={product.isAvailableForPurchase}
-                    />
-                    <DropdownMenuSeparator />
-                    <DeleteDropdownItem
-                      id={product.id}
-                      disabled={product._count.orders > 0}
-                    />
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+    <>
+      {products.map((p) => (
+        <div
+          key={p.id}
+          className="group relative flex flex-col rounded-2xl border border-gray-200/60 bg-white/70 backdrop-blur hover:shadow-xl shadow-sm transition-all p-5"
+        >
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex items-start gap-3 pr-2">
+              <CategoryIcon category={p.category} />
+              <h3 className="font-semibold text-gray-900 leading-snug line-clamp-2">
+                {p.name}
+              </h3>
+            </div>
+            <GlassStatusToggle
+              id={p.id}
+              isAvailable={p.isAvailableForPurchase}
+            />
+          </div>
+          <div className="flex items-center gap-6 text-sm mb-4">
+            <div className="flex flex-col">
+              <span className="text-[11px] uppercase text-gray-500 tracking-wide">
+                Price
+              </span>
+              <span className="font-semibold text-indigo-600">
+                {formatCurrency(Math.round(p.priceInCents / 100))}
+              </span>
+            </div>
+          </div>
+          <div className="mt-auto flex items-center gap-3 pt-1">
+            <InlineActions product={p} />
+          </div>
+          <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/5 group-hover:ring-indigo-300/50" />
+        </div>
+      ))}
+    </>
+  );
+}
+
+// (Old StatusBadge removed in favor of GlassStatusToggle)
+
+function InlineActions({
+  product,
+}: {
+  product: {
+    id: string;
+    isAvailableForPurchase: boolean;
+    _count?: { orders: number };
+  };
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        asChild
+        size="sm"
+        variant="glass"
+        className="h-7 px-3 text-[11px]"
+      >
+        <Link href={`/admin/products/${product.id}/edit`}>Edit</Link>
+      </Button>
+      <Button
+        asChild
+        size="sm"
+        variant="glass"
+        className="h-7 px-3 text-[11px] gap-1"
+      >
+        <a download href={`/admin/products/${product.id}/download`}>
+          Download
+        </a>
+      </Button>
+      <InlineDeleteButton
+        id={product.id}
+        disabled={(product._count?.orders ?? 0) > 0}
+      />
+    </div>
+  );
+}
+
+function Toolbar() {
+  return (
+    <div className="rounded-2xl border border-gray-200/70 bg-white/70 backdrop-blur p-4 flex flex-col md:flex-row md:items-center gap-4 shadow-sm">
+      <div className="flex-1 flex items-center gap-2">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <input
+            placeholder="Search products"
+            className="w-full pl-9 pr-3 h-10 rounded-lg border border-gray-200 bg-white/60 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 text-sm"
+          />
+        </div>
+        <Button variant="glass" size="sm" className="gap-1">
+          <Filter className="h-4 w-4" /> Filters
+        </Button>
+        <Button variant="glass" size="sm" className="gap-1">
+          <ArrowUpDown className="h-4 w-4" /> Sort
+        </Button>
+      </div>
+      <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-gray-500">
+        <span className="hidden md:inline-flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-green-500" /> Active
+        </span>
+        <span className="hidden md:inline-flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-gray-800" /> Inactive
+        </span>
+      </div>
+    </div>
   );
 }

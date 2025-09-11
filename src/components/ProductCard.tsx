@@ -1,15 +1,10 @@
 import { formatCurrency } from "@/lib/formatters";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Card, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import { Sparkles, TrendingUp, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type ProductCardProps = {
   id: string;
@@ -18,34 +13,105 @@ type ProductCardProps = {
   description: string;
   imagePath: string;
   category?: string;
+  createdAt?: Date | string;
+  _count?: { orders?: number };
 };
 
-export function ProductCard({
-  id,
-  name,
-  priceInCents,
-  description,
-  imagePath,
-  category = "Electronics",
-}: ProductCardProps) {
+export function ProductCard(props: ProductCardProps) {
+  const {
+    id,
+    name,
+    priceInCents,
+    description,
+    imagePath,
+    category = "Electronics",
+    createdAt,
+    _count,
+  } = props;
+
+  const ordersCount = _count?.orders ?? 0;
+  const created = createdAt ? new Date(createdAt) : undefined;
+  const isNew = created
+    ? Date.now() - created.getTime() < 1000 * 60 * 60 * 24 * 14
+    : false; // < 14 days
+  const isPopular = ordersCount >= 5; // threshold can be tuned
+
   return (
-    <Card className="flex overflow-hidden flex-col">
-      <div className="relative w-full h-auto aspect-video">
-        <Image src={imagePath} fill alt={name} />
-      </div>
-      <CardHeader>
-        <CardTitle>{name}</CardTitle>
-        <CardDescription>{formatCurrency(priceInCents / 100)}</CardDescription>
-        <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full w-fit">
-          {category}
+    <Card
+      className={cn(
+        "group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-white/80 backdrop-blur transition shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300",
+        "before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/50 before:to-white/10"
+      )}
+    >
+      <div className="relative w-full aspect-[4/3] overflow-hidden">
+        <Image
+          src={imagePath}
+          alt={name}
+          fill
+          sizes="(max-width:768px) 100vw, (max-width:1200px) 33vw, 25vw"
+          className="object-cover"
+          priority={isPopular || isNew}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-transparent" />
+        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+          <span className="text-[11px] tracking-wide font-medium px-2 py-1 rounded-full bg-white/90 shadow-sm text-gray-700">
+            {category}
+          </span>
+          {isPopular && (
+            <span className="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full bg-amber-500 text-white shadow-sm">
+              <TrendingUp className="h-3 w-3" /> Popular
+            </span>
+          )}
         </div>
-      </CardHeader>
-      <CardContent className="flex-grow">
-        <p className="line-clamp-4">{description}</p>
+        <div className="absolute top-3 right-3">
+          <span
+            className={cn(
+              "flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full shadow-sm transition-none pointer-events-none select-none",
+              isNew
+                ? "bg-indigo-600 text-white"
+                : "bg-white/85 text-gray-600 ring-1 ring-gray-300"
+            )}
+          >
+            <Sparkles
+              className={cn(
+                "h-3 w-3",
+                isNew ? "text-white" : "text-indigo-500"
+              )}
+            />
+            New
+          </span>
+        </div>
+      </div>
+      <CardContent className="pt-4 pb-0 px-5 flex-grow flex flex-col">
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <h3 className="text-base font-semibold text-gray-900 leading-snug line-clamp-2 flex-1">
+            {name}
+          </h3>
+          <div className="shrink-0 -mt-0.5 text-right">
+            <span className="inline-block rounded-md bg-indigo-50 px-2 py-1 text-[13px] font-semibold text-indigo-700 shadow-sm ring-1 ring-indigo-200">
+              {formatCurrency(Math.round(priceInCents / 100))}
+            </span>
+          </div>
+        </div>
+        <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 flex-grow">
+          {description}
+        </p>
+        {ordersCount > 0 && (
+          <p className="mt-3 text-[11px] uppercase tracking-wide text-gray-400 font-medium">
+            {ordersCount} {ordersCount === 1 ? "Order" : "Orders"}
+          </p>
+        )}
       </CardContent>
-      <CardFooter>
-        <Button asChild size="lg" className="w-full">
-          <Link href={`/products/${id}/purchase`}>View Details</Link>
+      <CardFooter className="p-5 pt-4">
+        <Button
+          asChild
+          size="sm"
+          className="w-full justify-center gap-2 font-medium bg-gray-900 hover:bg-gray-800 text-white group/button"
+        >
+          <Link href={`/products/${id}/purchase`}>
+            <span>View Details</span>
+            <ArrowRight className="h-4 w-4 transition-transform group-hover/button:translate-x-1" />
+          </Link>
         </Button>
       </CardFooter>
     </Card>
@@ -54,23 +120,16 @@ export function ProductCard({
 
 export function ProductCardSkeleton() {
   return (
-    <Card className="overflow-hidden flex flex-col animate-pulse">
-      <div className="w-full aspect-video bg-gray-300" />
-      <CardHeader>
-        <CardTitle>
-          <div className="w-3/4 h-6 rounded-full bg-gray-300" />
-        </CardTitle>
-        <CardDescription>
-          <div className="w-1/2 h-4 rounded-full bg-gray-300" />
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="w-full h-4 rounded-full bg-gray-300" />
-        <div className="w-full h-4 rounded-full bg-gray-300" />
-        <div className="w-3/4 h-4 rounded-full bg-gray-300" />
+    <Card className="overflow-hidden flex flex-col animate-pulse rounded-2xl bg-white/60 backdrop-blur border border-gray-200/50">
+      <div className="w-full aspect-[4/3] bg-gradient-to-br from-gray-200 to-gray-300" />
+      <CardContent className="p-5 space-y-3 flex-grow">
+        <div className="h-5 w-3/4 rounded bg-gray-300" />
+        <div className="h-4 w-1/2 rounded bg-gray-200" />
+        <div className="h-4 w-full rounded bg-gray-200" />
+        <div className="h-4 w-5/6 rounded bg-gray-200" />
       </CardContent>
-      <CardFooter>
-        <Button className="w-full" disabled size="lg"></Button>
+      <CardFooter className="p-5 pt-0">
+        <div className="h-9 w-full rounded-md bg-gray-300" />
       </CardFooter>
     </Card>
   );
