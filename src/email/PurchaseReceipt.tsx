@@ -3,13 +3,13 @@
 
 type PurchaseReceiptEmailProps = {
   product: {
-    name: string
-    imagePath: string
-    description: string
-  }
-  order: { id: string; createdAt: Date; pricePaidInCents: number }
-  downloadVerificationId: string
-}
+    name: string;
+    imagePath: string;
+    description: string;
+  };
+  order: { id: string; createdAt: Date; pricePaidInCents: number };
+  downloadVerificationId: string;
+};
 
 export default function PurchaseReceiptEmail({
   product,
@@ -24,5 +24,5 @@ export default function PurchaseReceiptEmail({
       <p>Order ID: {order.id}</p>
       <p>Download ID: {downloadVerificationId}</p>
     </div>
-  )
+  );
 }
