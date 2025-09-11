@@ -413,5 +413,7 @@ async function CategoryProductSuspense({ category }: { category: string }) {
 
   return products
     .slice(0, 1)
-    .map((product) => <ProductCard key={product.id} {...product} />);
+    .map((product: Product & { _count: { orders: number } }) => (
+      <ProductCard key={product.id} {...product} />
+    ));
 }
