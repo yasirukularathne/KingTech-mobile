@@ -14,7 +14,7 @@ import Image from "next/image";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden py-8">
       {/* Advanced Background System */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50" />
 
@@ -42,8 +42,8 @@ export function Hero() {
         </div>
 
         {/* Main Headline */}
-        <div className="space-y-6 mb-12">
-          <h1 className="text-5xl sm:text-6xl lg:text-8xl font-bold tracking-tight">
+        <div className="space-y-4 mb-8">
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight">
             <span className="block text-slate-900 leading-none">
               The Future of
             </span>
@@ -53,7 +53,7 @@ export function Hero() {
             <span className="block text-slate-900 leading-none">is Here</span>
           </h1>
 
-          <p className="mx-auto max-w-3xl text-xl lg:text-2xl text-slate-600 leading-relaxed font-light">
+          <p className="mx-auto max-w-3xl text-lg lg:text-xl text-slate-600 leading-relaxed font-light">
             Experience premium technology that transforms your digital life.
             <span className="font-medium text-slate-800">
               {" "}
@@ -73,7 +73,7 @@ export function Hero() {
         </div>
 
         {/* CTA Section */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
           <Button
             asChild
             size="lg"
@@ -103,7 +103,7 @@ export function Hero() {
         </div>
 
         {/* Social Proof & Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
           <div className="group p-6 rounded-2xl bg-white/40 backdrop-blur-sm border border-white/50 hover:bg-white/60 transition-all duration-300">
             <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 text-white mb-4 mx-auto group-hover:scale-110 transition-transform">
               <Truck className="h-6 w-6" />

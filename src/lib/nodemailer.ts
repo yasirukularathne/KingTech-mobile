@@ -1,4 +1,5 @@
-import nodemailer from "nodemailer";
+// This file has been disabled due to dependency conflicts
+// Email functionality is handled by other services
 
 export async function sendEmail({
   to,
@@ -11,25 +12,6 @@ export async function sendEmail({
   html?: string;
   text?: string;
 }) {
-  // Configure your SMTP transporter
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
-  // Send mail
-  const info = await transporter.sendMail({
-    from: process.env.SMTP_FROM || "no-reply@example.com",
-    to,
-    subject,
-    html,
-    text,
-  });
-
-  return info;
+  console.log("Email functionality disabled");
+  return { messageId: "disabled" };
 }

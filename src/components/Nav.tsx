@@ -7,7 +7,7 @@ import { ComponentProps, ReactNode } from "react";
 
 export function Nav({ children }: { children: ReactNode }) {
   return (
-    <nav className="sticky top-2 z-50 bg-primary/70 text-primary-foreground flex items-center justify-between py-3 rounded-3xl shadow-lg mt-4 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 backdrop-blur-lg border border-white/30">
+    <nav className="sticky top-2 z-50 bg-primary/70 text-primary-foreground flex items-center justify-between py-1.5 rounded-3xl shadow-lg mt-2 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 backdrop-blur-lg border border-white/30">
       <div className="flex items-center gap-2">
         <span className="font-bold text-xl tracking-wide">🛒 E-Shop</span>
       </div>
