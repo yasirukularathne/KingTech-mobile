@@ -114,7 +114,9 @@ export default async function HomePage() {
   );
   const maxCategoryCount = Math.max(
     1,
-    ...categoryStats.map((c) => c.count || 0)
+    ...categoryStats.map(
+      (c: typeof categories[0] & { count: number }) => c.count || 0
+    )
   );
 
   return (
@@ -180,111 +182,119 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              {categoryStats.map((c, idx) => {
-                const pct = Math.round(
-                  ((c.count || 0) / (maxCategoryCount || 1)) * 100
-                );
-                return (
-                  <span
-                    key={c.name + "-badge"}
-                    className="group relative overflow-hidden px-4 py-2 rounded-full bg-white/70 backdrop-blur border border-gray-200/70 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-xs font-medium tracking-wide text-gray-700"
-                  >
-                    {/* Decorative gradient aura */}
+              {categoryStats.map(
+                (c: typeof categories[0] & { count: number }, idx: number) => {
+                  const pct = Math.round(
+                    ((c.count || 0) / (maxCategoryCount || 1)) * 100
+                  );
+                  return (
                     <span
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{
-                        background:
-                          "radial-gradient(circle at 30% 30%, rgba(99,102,241,0.18), transparent 70%)",
-                      }}
-                    />
-                    {/* Colored dot */}
-                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 ring-2 ring-white/60 shadow" />
-                    <span className="relative capitalize">{c.name}</span>
-                    <span className="relative text-gray-400">• {c.count}</span>
-                    {/* Mini progress bar */}
-                    <span className="relative ml-1 h-2 w-16 rounded-full bg-gray-200/70 overflow-hidden">
+                      key={c.name + "-badge"}
+                      className="group relative overflow-hidden px-4 py-2 rounded-full bg-white/70 backdrop-blur border border-gray-200/70 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-xs font-medium tracking-wide text-gray-700"
+                    >
+                      {/* Decorative gradient aura */}
                       <span
-                        className="absolute left-0 top-0 h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 transition-all duration-500"
-                        style={{ width: `${pct}%` }}
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                        style={{
+                          background:
+                            "radial-gradient(circle at 30% 30%, rgba(99,102,241,0.18), transparent 70%)",
+                        }}
                       />
+                      {/* Colored dot */}
+                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 ring-2 ring-white/60 shadow" />
+                      <span className="relative capitalize">{c.name}</span>
+                      <span className="relative text-gray-400">
+                        • {c.count}
+                      </span>
+                      {/* Mini progress bar */}
+                      <span className="relative ml-1 h-2 w-16 rounded-full bg-gray-200/70 overflow-hidden">
+                        <span
+                          className="absolute left-0 top-0 h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </span>
+                      <span className="relative text-[10px] text-gray-400 font-semibold tabular-nums">
+                        {pct}%
+                      </span>
                     </span>
-                    <span className="relative text-[10px] text-gray-400 font-semibold tabular-nums">
-                      {pct}%
-                    </span>
-                  </span>
-                );
-              })}
+                  );
+                }
+              )}
             </div>
           </div>
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {categoryStats.map((category) => {
-              const pct = Math.round((category.count / maxCategoryCount) * 100);
-              return (
-                <Link
-                  key={category.name}
-                  href={`/products?category=${category.name}`}
-                  className="group relative"
-                >
-                  <div className="relative h-full overflow-hidden rounded-3xl border border-gray-200/60 bg-white/70 backdrop-blur shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col p-8">
-                    {/* Accent gradient bar */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500" />
-                    {/* Soft radial highlight */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.15),transparent_70%)]" />
-                    <div className="flex items-center gap-4 mb-6 relative">
-                      <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 text-white shadow-lg ring-4 ring-white/40">
-                        <category.icon className="h-7 w-7 drop-shadow" />
+            {categoryStats.map(
+              (category: typeof categories[0] & { count: number }) => {
+                const pct = Math.round(
+                  (category.count / maxCategoryCount) * 100
+                );
+                return (
+                  <Link
+                    key={category.name}
+                    href={`/products?category=${category.name}`}
+                    className="group relative"
+                  >
+                    <div className="relative h-full overflow-hidden rounded-3xl border border-gray-200/60 bg-white/70 backdrop-blur shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col p-8">
+                      {/* Accent gradient bar */}
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500" />
+                      {/* Soft radial highlight */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.15),transparent_70%)]" />
+                      <div className="flex items-center gap-4 mb-6 relative">
+                        <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 text-white shadow-lg ring-4 ring-white/40">
+                          <category.icon className="h-7 w-7 drop-shadow" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-semibold tracking-tight text-gray-900">
+                            {category.name}
+                          </h3>
+                          <p className="text-xs uppercase tracking-wide text-gray-500 font-medium">
+                            {category.count}{" "}
+                            {category.count === 1 ? "Product" : "Products"}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-semibold tracking-tight text-gray-900">
-                          {category.name}
-                        </h3>
-                        <p className="text-xs uppercase tracking-wide text-gray-500 font-medium">
-                          {category.count}{" "}
-                          {category.count === 1 ? "Product" : "Products"}
-                        </p>
+                      <p className="text-sm text-gray-600 leading-relaxed flex-grow relative mb-4">
+                        {category.description}
+                      </p>
+                      {/* Brand names */}
+                      <div className="flex flex-wrap gap-1.5 mb-4">
+                        {category.brands.slice(0, 4).map((brand, idx) => (
+                          <span
+                            key={brand}
+                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 border border-indigo-200/50"
+                          >
+                            {brand}
+                          </span>
+                        ))}
+                        {category.brands.length > 4 && (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                            +{category.brands.length - 4} more
+                          </span>
+                        )}
                       </div>
-                    </div>
-                    <p className="text-sm text-gray-600 leading-relaxed flex-grow relative mb-4">
-                      {category.description}
-                    </p>
-                    {/* Brand names */}
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {category.brands.slice(0, 4).map((brand, idx) => (
-                        <span
-                          key={brand}
-                          className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 border border-indigo-200/50"
-                        >
-                          {brand}
-                        </span>
-                      ))}
-                      {category.brands.length > 4 && (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                          +{category.brands.length - 4} more
-                        </span>
-                      )}
-                    </div>
-                    {/* Progress indicator */}
-                    <div className="mt-6 relative">
-                      <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 transition-all duration-500"
-                          style={{ width: `${pct}%` }}
-                        />
+                      {/* Progress indicator */}
+                      <div className="mt-6 relative">
+                        <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 transition-all duration-500"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <div className="mt-2 flex items-center justify-between text-[11px] font-medium text-gray-500 uppercase tracking-wide">
+                          <span>Inventory</span>
+                          <span>{pct}%</span>
+                        </div>
                       </div>
-                      <div className="mt-2 flex items-center justify-between text-[11px] font-medium text-gray-500 uppercase tracking-wide">
-                        <span>Inventory</span>
-                        <span>{pct}%</span>
+                      <div className="mt-8 flex items-center gap-2 text-sm font-medium text-indigo-600 group-hover:text-indigo-700 relative">
+                        Explore
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                       </div>
+                      <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-gray-900/5 group-hover:ring-indigo-300/40" />
                     </div>
-                    <div className="mt-8 flex items-center gap-2 text-sm font-medium text-indigo-600 group-hover:text-indigo-700 relative">
-                      Explore
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </div>
-                    <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-gray-900/5 group-hover:ring-indigo-300/40" />
-                  </div>
-                </Link>
-              );
-            })}
+                  </Link>
+                );
+              }
+            )}
           </div>
         </div>
       </section>
