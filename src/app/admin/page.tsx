@@ -10,6 +10,7 @@ import { formatNumber, formatCurrency } from "@/lib/formatters";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { redirect } from "next/navigation";
+import { Product } from "@prisma/client";
 
 async function getProductData() {
   const [activeCount, inactiveCount, pricing] = await Promise.all([
@@ -57,7 +58,7 @@ async function getWeeklyAdds(weeks = 6) {
     const end = new Date(now);
     end.setDate(now.getDate() - i * 7);
     const count = recent.filter(
-      (p) => p.createdAt >= start && p.createdAt < end
+      (p: { createdAt: Date }) => p.createdAt >= start && p.createdAt < end
     ).length;
     buckets.push({ label: `W-${weeks - i}`, count });
   }
@@ -76,7 +77,9 @@ async function getPriceStats() {
       avg: 0,
       buckets: [] as { label: string; count: number }[],
     };
-  const prices = products.map((p) => p.priceInCents).sort((a, b) => a - b);
+  const prices = products
+    .map((p: { priceInCents: number }) => p.priceInCents)
+    .sort((a: number, b: number) => a - b);
   const min = prices[0];
   const max = prices[prices.length - 1];
   const median =
@@ -85,7 +88,9 @@ async function getPriceStats() {
       : Math.round(
           (prices[prices.length / 2 - 1] + prices[prices.length / 2]) / 2
         );
-  const avg = Math.round(prices.reduce((s, v) => s + v, 0) / prices.length);
+  const avg = Math.round(
+    prices.reduce((s: number, v: number) => s + v, 0) / prices.length
+  );
   // 5 buckets histogram
   const bucketCount = 5;
   const span = Math.max(1, max - min);
@@ -132,11 +137,19 @@ async function getCategoryCoverage() {
     if (p.isAvailableForPurchase) map[p.category].active++;
   }
   const entries = Object.values(map);
-  const total = entries.reduce((s, e) => s + e.total, 0);
-  const top = entries.reduce((m, e) => Math.max(m, e.total), 0);
+  const total = entries.reduce(
+    (s: number, e: { total: number; active: number }) => s + e.total,
+    0
+  );
+  const top = entries.reduce(
+    (m: number, e: { total: number; active: number }) => Math.max(m, e.total),
+    0
+  );
   return {
     distinct: entries.length,
-    activeCategories: entries.filter((e) => e.active > 0).length,
+    activeCategories: entries.filter(
+      (e: { total: number; active: number }) => e.active > 0
+    ).length,
     topShare: total ? top / total : 0,
   };
 }
@@ -321,24 +334,31 @@ export default async function AdminDashboard() {
               {recentProducts.length === 0 && (
                 <li className="py-2 text-gray-500 text-xs">No products</li>
               )}
-              {recentProducts.map((p) => (
-                <li key={p.id} className="py-2 flex items-center gap-3">
-                  <span
-                    className={
-                      "h-2.5 w-2.5 rounded-full " +
-                      (p.isAvailableForPurchase
-                        ? "bg-indigo-500"
-                        : "bg-gray-300")
-                    }
-                  ></span>
-                  <span className="flex-1 line-clamp-1 text-gray-800 font-medium">
-                    {p.name}
-                  </span>
-                  <span className="text-[11px] text-gray-400 tabular-nums">
-                    {relativeTime(p.createdAt)}
-                  </span>
-                </li>
-              ))}
+              {recentProducts.map(
+                (p: {
+                  id: string;
+                  name: string;
+                  createdAt: Date;
+                  isAvailableForPurchase: boolean;
+                }) => (
+                  <li key={p.id} className="py-2 flex items-center gap-3">
+                    <span
+                      className={
+                        "h-2.5 w-2.5 rounded-full " +
+                        (p.isAvailableForPurchase
+                          ? "bg-indigo-500"
+                          : "bg-gray-300")
+                      }
+                    ></span>
+                    <span className="flex-1 line-clamp-1 text-gray-800 font-medium">
+                      {p.name}
+                    </span>
+                    <span className="text-[11px] text-gray-400 tabular-nums">
+                      {relativeTime(p.createdAt)}
+                    </span>
+                  </li>
+                )
+              )}
             </ul>
           </CardContent>
         </Card>
@@ -471,10 +491,15 @@ function CategoryBars({
 }) {
   if (data.length === 0)
     return <p className="text-xs text-gray-500">No data</p>;
-  const max = Math.max(...data.map((d) => d.total), 1);
+  const max = Math.max(
+    ...data.map(
+      (d: { category: string; total: number; active: number }) => d.total
+    ),
+    1
+  );
   return (
     <ul className="space-y-3">
-      {data.map((d) => {
+      {data.map((d: { category: string; total: number; active: number }) => {
         const activePct = (d.active / d.total) * 100;
         const widthPct = (d.total / max) * 100;
         return (
@@ -514,9 +539,12 @@ function WeeklySparkline({
 }: {
   data: { label: string; count: number }[];
 }) {
-  const max = Math.max(...data.map((d) => d.count), 1);
+  const max = Math.max(
+    ...data.map((d: { label: string; count: number }) => d.count),
+    1
+  );
   const points = data
-    .map((d, i) => {
+    .map((d: { label: string; count: number }, i: number) => {
       const x = (i / (data.length - 1)) * 100;
       const y = 100 - (d.count / max) * 100;
       return `${x},${y}`;
@@ -560,7 +588,7 @@ function WeeklySparkline({
         })}
       </div>
       <div className="mt-2 grid grid-cols-6 text-[10px] text-gray-500 font-medium tracking-wide">
-        {data.map((d) => (
+        {data.map((d: { label: string; count: number }) => (
           <span key={d.label} className="text-center">
             {d.label}
           </span>
@@ -574,10 +602,13 @@ function WeeklySparkline({
 function Histogram({ data }: { data: { label: string; count: number }[] }) {
   if (data.length === 0)
     return <p className="text-xs text-gray-500">No data</p>;
-  const max = Math.max(...data.map((d) => d.count), 1);
+  const max = Math.max(
+    ...data.map((d: { label: string; count: number }) => d.count),
+    1
+  );
   return (
     <div className="flex items-end gap-1 h-20">
-      {data.map((d) => (
+      {data.map((d: { label: string; count: number }) => (
         <div key={d.label} className="flex-1 flex flex-col items-center gap-1">
           <div
             className="w-full rounded-t-md bg-gradient-to-t from-indigo-500 to-blue-500"
