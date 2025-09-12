@@ -2,6 +2,7 @@ import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard";
 import { CategoryNav } from "@/components/CategoryNav";
 import db from "@/db/db";
 import { cache } from "@/lib/cache";
+import { Product } from "@prisma/client";
 import { Suspense } from "react";
 import { ArrowDownWideNarrow, RefreshCcw } from "lucide-react";
 import Link from "next/link";
@@ -171,7 +172,7 @@ async function ProductsSuspense({ category }: { category?: string }) {
     );
   }
 
-  return products.map((product) => (
+  return products.map((product: Product & { _count: { orders: number } }) => (
     <ProductCard key={product.id} {...product} />
   ));
 }
