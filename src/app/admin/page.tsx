@@ -156,8 +156,13 @@ async function getCategoryCoverage() {
 
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
-  const adminEmails = ["yasirukularathne1234@gmail.com"];
-  const email = session?.user?.email ?? "";
+  const adminEmails = (
+    process.env.ADMIN_EMAILS || "yasirukularathne1234@gmail.com"
+  )
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  const email = (session?.user?.email || "").toLowerCase();
   if (!session || !email || !adminEmails.includes(email)) {
     redirect("/login");
   }
