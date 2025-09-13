@@ -147,7 +147,7 @@ export default async function HomePage() {
         </div>
       </section>
       {/* Brand Showcase (moved up) */}
-      <section className="py-12">
+      <section className="py-10 sm:py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
@@ -157,7 +157,7 @@ export default async function HomePage() {
               Trusted brands, quality products
             </p>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <CategorySection category="Phones" />
             <CategorySection category="Laptops" />
             <CategorySection category="TVs" />
@@ -168,10 +168,10 @@ export default async function HomePage() {
       <Features />
 
       {/* Categories Grid (reduced top spacing) */}
-      <section className="pt-10 pb-20 relative">
+      <section className="pt-8 sm:pt-10 pb-16 sm:pb-20 relative">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-indigo-50/40 to-transparent" />
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-14">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 md:gap-8 mb-10 md:mb-14">
             <div className="max-w-xl space-y-4">
               <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-gray-900">
                 Shop by Category
@@ -181,7 +181,7 @@ export default async function HomePage() {
                 entertainment.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2.5 md:gap-3 justify-center lg:justify-end">
               {categoryStats.map(
                 (c: typeof categories[0] & { count: number }, idx: number) => {
                   const pct = Math.round(
@@ -190,7 +190,7 @@ export default async function HomePage() {
                   return (
                     <span
                       key={c.name + "-badge"}
-                      className="group relative overflow-hidden px-4 py-2 rounded-full bg-white/70 backdrop-blur border border-gray-200/70 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-xs font-medium tracking-wide text-gray-700"
+                      className="group relative overflow-hidden px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/70 backdrop-blur border border-gray-200/70 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-xs font-medium tracking-wide text-gray-700"
                     >
                       {/* Decorative gradient aura */}
                       <span
@@ -207,7 +207,7 @@ export default async function HomePage() {
                         • {c.count}
                       </span>
                       {/* Mini progress bar */}
-                      <span className="relative ml-1 h-2 w-16 rounded-full bg-gray-200/70 overflow-hidden">
+                      <span className="relative ml-1 h-2 w-14 md:w-16 rounded-full bg-gray-200/70 overflow-hidden">
                         <span
                           className="absolute left-0 top-0 h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 transition-all duration-500"
                           style={{ width: `${pct}%` }}
@@ -222,7 +222,7 @@ export default async function HomePage() {
               )}
             </div>
           </div>
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
             {categoryStats.map(
               (category: typeof categories[0] & { count: number }) => {
                 const pct = Math.round(
@@ -234,14 +234,14 @@ export default async function HomePage() {
                     href={`/products?category=${category.name}`}
                     className="group relative"
                   >
-                    <div className="relative h-full overflow-hidden rounded-3xl border border-gray-200/60 bg-white/70 backdrop-blur shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col p-8">
+                    <div className="relative h-full overflow-hidden rounded-3xl border border-gray-200/60 bg-white/70 backdrop-blur shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col p-6 md:p-8">
                       {/* Accent gradient bar */}
                       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500" />
                       {/* Soft radial highlight */}
                       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.15),transparent_70%)]" />
                       <div className="flex items-center gap-4 mb-6 relative">
-                        <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 text-white shadow-lg ring-4 ring-white/40">
-                          <category.icon className="h-7 w-7 drop-shadow" />
+                        <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 text-white shadow-lg ring-4 ring-white/40">
+                          <category.icon className="h-6 w-6 md:h-7 md:w-7 drop-shadow" />
                         </div>
                         <div>
                           <h3 className="text-xl font-semibold tracking-tight text-gray-900">
@@ -302,12 +302,12 @@ export default async function HomePage() {
       <Testimonials />
 
       {/* Call to Action */}
-      <section className="bg-gray-900 text-white py-14 pb-10">
+      <section className="bg-gray-900 text-white py-12 sm:py-14">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4">
             Ready to Upgrade Your Tech?
           </h2>
-          <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-gray-300 text-base sm:text-lg mb-8 max-w-2xl mx-auto">
             Join thousands of satisfied customers who trust us for their
             technology needs
           </p>
