@@ -35,9 +35,63 @@ const mockProducts = [
 // Mock database client for when DATABASE_URL is missing
 const createMockClient = () => ({
   product: {
-    findMany: async () => mockProducts,
-    findUnique: async () => mockProducts[0] || null,
-    count: async () => mockProducts.length,
+    findMany: async (args?: any) => {
+      if (!args) return mockProducts;
+      const { select, orderBy, where, take } = args;
+      let items = [...mockProducts];
+      if (where?.createdAt?.gte) {
+        items = items.filter((p) => p.createdAt >= where.createdAt.gte);
+      }
+      if (typeof where?.isAvailableForPurchase === "boolean") {
+        items = items.filter(
+          (p) => p.isAvailableForPurchase === where.isAvailableForPurchase
+        );
+      }
+      if (orderBy?.updatedAt === "desc") {
+        items.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+      }
+      if (take) items = items.slice(0, take);
+      if (select) {
+        return items.map((p) => {
+          const out: any = {};
+          for (const key of Object.keys(select)) {
+            if (key === "_count" && select._count?.orders) {
+              out._count = { orders: p._count?.orders ?? 0 };
+            } else if (select[key]) {
+              out[key] = (p as any)[key];
+            }
+          }
+          return out;
+        });
+      }
+      return items;
+    },
+    findUnique: async (args?: any) => {
+      if (!args?.where?.id) return mockProducts[0] || null;
+      return mockProducts.find((p) => p.id === args.where.id) || null;
+    },
+    count: async (args?: any) => {
+      if (!args?.where) return mockProducts.length;
+      let items = [...mockProducts];
+      if (typeof args.where.isAvailableForPurchase === "boolean") {
+        items = items.filter(
+          (p) => p.isAvailableForPurchase === args.where.isAvailableForPurchase
+        );
+      }
+      return items.length;
+    },
+    aggregate: async (args?: any) => {
+      const selectAvg = args?._avg?.priceInCents;
+      const prices = mockProducts.map((p) => p.priceInCents);
+      const avg = prices.length
+        ? prices.reduce((a, b) => a + b, 0) / prices.length
+        : 0;
+      return {
+        _avg: {
+          priceInCents: selectAvg ? avg : null,
+        },
+      };
+    },
     create: async () => mockProducts[0],
     update: async () => mockProducts[0],
     delete: async () => mockProducts[0],
