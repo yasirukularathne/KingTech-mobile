@@ -85,39 +85,48 @@ async function ProductsGrid() {
     );
   return (
     <>
-      {products.map((p) => (
-        <div
-          key={p.id}
-          className="group relative flex flex-col rounded-2xl border border-gray-200/60 bg-white/70 backdrop-blur hover:shadow-xl shadow-sm transition-all p-5"
-        >
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="flex items-start gap-3 pr-2">
-              <CategoryIcon category={p.category} />
-              <h3 className="font-semibold text-gray-900 leading-snug line-clamp-2">
-                {p.name}
-              </h3>
+      {products.map(
+        (p: {
+          id: string;
+          name: string;
+          category: string;
+          priceInCents: number;
+          isAvailableForPurchase: boolean;
+          _count: { orders: number };
+        }) => (
+          <div
+            key={p.id}
+            className="group relative flex flex-col rounded-2xl border border-gray-200/60 bg-white/70 backdrop-blur hover:shadow-xl shadow-sm transition-all p-5"
+          >
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="flex items-start gap-3 pr-2">
+                <CategoryIcon category={p.category} />
+                <h3 className="font-semibold text-gray-900 leading-snug line-clamp-2">
+                  {p.name}
+                </h3>
+              </div>
+              <GlassStatusToggle
+                id={p.id}
+                isAvailable={p.isAvailableForPurchase}
+              />
             </div>
-            <GlassStatusToggle
-              id={p.id}
-              isAvailable={p.isAvailableForPurchase}
-            />
-          </div>
-          <div className="flex items-center gap-6 text-sm mb-4">
-            <div className="flex flex-col">
-              <span className="text-[11px] uppercase text-gray-500 tracking-wide">
-                Price
-              </span>
-              <span className="font-semibold text-indigo-600">
-                {formatCurrency(Math.round(p.priceInCents / 100))}
-              </span>
+            <div className="flex items-center gap-6 text-sm mb-4">
+              <div className="flex flex-col">
+                <span className="text-[11px] uppercase text-gray-500 tracking-wide">
+                  Price
+                </span>
+                <span className="font-semibold text-indigo-600">
+                  {formatCurrency(Math.round(p.priceInCents / 100))}
+                </span>
+              </div>
             </div>
+            <div className="mt-auto flex items-center gap-3 pt-1">
+              <InlineActions product={p} />
+            </div>
+            <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/5 group-hover:ring-indigo-300/50" />
           </div>
-          <div className="mt-auto flex items-center gap-3 pt-1">
-            <InlineActions product={p} />
-          </div>
-          <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/5 group-hover:ring-indigo-300/50" />
-        </div>
-      ))}
+        )
+      )}
     </>
   );
 }
