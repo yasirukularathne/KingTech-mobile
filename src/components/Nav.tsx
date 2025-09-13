@@ -38,15 +38,21 @@ export function Nav({ children }: { children: ReactNode }) {
 export function NavLink(props: Omit<ComponentProps<typeof Link>, "className">) {
   const pathname = usePathname();
   const isActive = pathname === props.href;
+  const { children, ...rest } = props as any;
   return (
     <Link
-      {...props}
+      {...rest}
       className={cn(
         "group relative inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all",
         isActive
           ? "bg-white shadow ring-1 ring-indigo-300/60 text-gray-900"
-          : "text-gray-600 hover:text-gray-900 hover:bg-white/70"
+          : "text-gray-500 hover:text-gray-900 hover:bg-white/70"
       )}
-    />
+    >
+      {children}
+      {isActive && (
+        <span className="absolute -bottom-px left-2 right-2 h-0.5 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500" />
+      )}
+    </Link>
   );
 }
