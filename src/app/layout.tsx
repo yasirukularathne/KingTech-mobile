@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { SessionProvider } from "next-auth/react";
 import { FooterConditional } from "@/components/FooterConditional";
+import { PointerHighlight } from "@/components/PointerHighlight";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
           inter.variable
         )}
       >
+        <PointerHighlight />
         <div className="flex-1 flex flex-col">{children}</div>
         <FooterConditional />
       </body>
