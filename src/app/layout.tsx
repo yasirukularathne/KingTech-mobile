@@ -27,7 +27,7 @@ export default function RootLayout({
         )}
       >
         <PointerHighlight />
-        <div className="relative z-10 flex-1 flex flex-col">{children}</div>
+        <div className="flex-1 flex flex-col">{children}</div>
         <FooterConditional />
       </body>
     </html>
