@@ -73,13 +73,13 @@ export function PointerHighlight() {
       {/* Cursor ring */}
       <div
         ref={dotRef}
-        className="pointer-events-none fixed top-0 left-0 z-[60] hidden md:block h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-indigo-500/70 shadow-[0_0_20px_rgba(99,102,241,0.35)] transition-opacity duration-200"
+        className="pointer-events-none fixed top-0 left-0 z-[1] hidden md:block h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-indigo-500/60 shadow-[0_0_14px_rgba(99,102,241,0.25)] transition-opacity duration-200 mix-blend-multiply"
         style={{ opacity: 0, transform: "translate3d(-100px,-100px,0)" }}
       />
       {/* Soft glow */}
       <div
         ref={glowRef}
-        className="pointer-events-none fixed top-0 left-0 z-[59] hidden md:block h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/20 blur-2xl transition-opacity duration-300"
+        className="pointer-events-none fixed top-0 left-0 z-0 hidden md:block h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-400/18 blur-3xl transition-opacity duration-300 mix-blend-multiply"
         style={{ opacity: 0, transform: "translate3d(-100px,-100px,0)" }}
       />
     </>
