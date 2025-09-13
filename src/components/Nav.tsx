@@ -7,12 +7,31 @@ import { ComponentProps, ReactNode } from "react";
 
 export function Nav({ children }: { children: ReactNode }) {
   return (
-    <nav className="sticky top-2 z-50 bg-primary/70 text-primary-foreground flex items-center justify-between py-1.5 rounded-3xl shadow-lg mt-2 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 backdrop-blur-lg border border-white/30">
-      <div className="flex items-center gap-2">
-        <span className="font-bold text-xl tracking-wide">🛒 E-Shop</span>
-      </div>
-      <div className="flex gap-2">{children}</div>
-    </nav>
+    <div className="relative">
+      <div
+        aria-hidden
+        className="absolute -inset-x-4 -bottom-6 top-0 -z-10 backdrop-blur-2xl bg-white/40 [mask-image:linear-gradient(to_bottom,black,70%,transparent)]"
+      />
+      <nav className="flex items-center gap-4 overflow-x-auto scrollbar-none rounded-2xl bg-white/60 backdrop-blur-xl px-5 py-1.5 ring-1 ring-gray-200/60 shadow-lg relative">
+        <Link
+          href="/"
+          className="flex items-center gap-3 pr-4 mr-2 border-r border-gray-200/60"
+        >
+          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 flex items-center justify-center shadow ring-2 ring-white/60">
+            <span className="text-white text-sm font-bold">KT</span>
+          </div>
+          <div className="flex flex-col leading-tight">
+            <span className="text-lg font-semibold tracking-tight text-gray-900">
+              KingTech
+            </span>
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
+              Storefront
+            </span>
+          </div>
+        </Link>
+        <div className="ml-auto flex items-center gap-2">{children}</div>
+      </nav>
+    </div>
   );
 }
 
@@ -23,10 +42,10 @@ export function NavLink(props: Omit<ComponentProps<typeof Link>, "className">) {
     <Link
       {...props}
       className={cn(
-        "relative px-4 py-2 rounded-lg transition-colors duration-200 font-medium text-base hover:bg-secondary hover:text-secondary-foreground focus-visible:bg-secondary focus-visible:text-secondary-foreground",
-        isActive ? "bg-background text-foreground shadow-md" : "",
-        "after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-1 after:w-2/3 after:h-0.5 after:bg-accent after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-200",
-        isActive ? "after:scale-x-100" : ""
+        "group relative inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all",
+        isActive
+          ? "bg-white shadow ring-1 ring-indigo-300/60 text-gray-900"
+          : "text-gray-600 hover:text-gray-900 hover:bg-white/70"
       )}
     />
   );
