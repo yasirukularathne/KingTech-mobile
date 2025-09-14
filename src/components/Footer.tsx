@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Github, Twitter, Linkedin, Mail, ShoppingBag } from "lucide-react";
+import Image from "next/image";
+import { Github, Twitter, Linkedin, Mail } from "lucide-react";
 import { NewsletterForm } from "@/components/footer/NewsletterForm";
 
 const productLinks = [
@@ -39,8 +40,15 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-6 lg:col-span-2">
             <Link href="/" className="inline-flex items-center gap-2 group">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 flex items-center justify-center text-white shadow-lg ring-1 ring-white/20">
-                <ShoppingBag className="h-5 w-5" />
+              <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-white/20 shadow">
+                <Image
+                  src="/KingTechLogo.png"
+                  alt="KingTech Logo"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 object-cover"
+                  priority
+                />
               </div>
               <span className="text-xl font-semibold tracking-tight text-white group-hover:text-indigo-300 transition-colors">
                 KingTech
