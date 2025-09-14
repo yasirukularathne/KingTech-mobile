@@ -3,8 +3,7 @@
 import { useEffect, useRef } from "react";
 
 export function PointerHighlight() {
-  const dotRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -22,19 +21,18 @@ export function PointerHighlight() {
     const setVisible = (v: boolean) => {
       if (visible === v) return;
       visible = v;
-      const el = dotRef.current;
-      const glow = glowRef.current;
-      if (el) el.style.opacity = v ? "1" : "0";
-      if (glow) glow.style.opacity = v ? "0.6" : "0";
+      const overlay = overlayRef.current;
+      if (overlay) overlay.style.opacity = v ? "1" : "0";
     };
 
     const update = () => {
       x += (tx - x) * 0.2;
       y += (ty - y) * 0.2;
-      const el = dotRef.current;
-      const glow = glowRef.current;
-      if (el) el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      if (glow) glow.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      const overlay = overlayRef.current;
+      if (overlay) {
+        overlay.style.setProperty("--x", `${x}px`);
+        overlay.style.setProperty("--y", `${y}px`);
+      }
       if (Math.abs(tx - x) < 0.1 && Math.abs(ty - y) < 0.1) {
         raf = 0;
       } else {
@@ -69,19 +67,18 @@ export function PointerHighlight() {
   }, []);
 
   return (
-    <>
-      {/* Cursor ring */}
-      <div
-        ref={dotRef}
-        className="pointer-events-none fixed top-0 left-0 z-[60] hidden md:block h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-indigo-500/70 shadow-[0_0_20px_rgba(99,102,241,0.35)] transition-opacity duration-200"
-        style={{ opacity: 0, transform: "translate3d(-100px,-100px,0)" }}
-      />
-      {/* Soft glow */}
-      <div
-        ref={glowRef}
-        className="pointer-events-none fixed top-0 left-0 z-[59] hidden md:block h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/20 blur-2xl transition-opacity duration-300"
-        style={{ opacity: 0, transform: "translate3d(-100px,-100px,0)" }}
-      />
-    </>
+    <div
+      ref={overlayRef}
+      className="pointer-events-none fixed inset-0 z-[40] hidden md:block transition-opacity duration-200"
+      style={
+        {
+          opacity: 0,
+          // Elegant radial gradient spotlight that follows the cursor
+          background:
+            "radial-gradient(600px circle at var(--x) var(--y), rgba(99,102,241,0.20), transparent 60%)",
+          mixBlendMode: "normal",
+        } as React.CSSProperties
+      }
+    />
   );
 }
