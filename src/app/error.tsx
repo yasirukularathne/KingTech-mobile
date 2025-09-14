@@ -26,7 +26,7 @@ export default function GlobalError({
               Something went wrong
             </h1>
             <p style={{ opacity: 0.85, marginBottom: 12 }}>
-              A server component failed to render. We've captured the error
+              A server component failed to render. We&apos;ve captured the error
               digest for debugging.
             </p>
             {error?.digest && (
