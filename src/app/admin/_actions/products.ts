@@ -5,6 +5,7 @@ import { z } from "zod";
 import fs from "fs/promises";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { uploadImage, destroyImage } from "@/lib/cloudinary";
 
 const fileSchema = z.instanceof(File, { message: "Required" });
 const imageSchema = fileSchema.refine(
@@ -32,12 +33,11 @@ export async function addProduct(prevState: unknown, formData: FormData) {
   const filePath = `products/${crypto.randomUUID()}-${data.file.name}`;
   await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()));
 
-  await fs.mkdir("public/products", { recursive: true });
-  const imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`;
-  await fs.writeFile(
-    `public${imagePath}`,
-    Buffer.from(await data.image.arrayBuffer())
-  );
+  // Upload image to Cloudinary
+  const imgBuf = Buffer.from(await data.image.arrayBuffer());
+  const uploaded = await uploadImage(imgBuf, "kingtech/products");
+  const imagePath = uploaded.url;
+  const imagePublicId = uploaded.public_id;
 
   await db.product.create({
     data: {
@@ -48,6 +48,7 @@ export async function addProduct(prevState: unknown, formData: FormData) {
       priceInCents: data.priceInCents,
       filePath,
       imagePath,
+      imagePublicId,
     },
   });
 
@@ -85,13 +86,15 @@ export async function updateProduct(
   }
 
   let imagePath = product.imagePath;
+  let imagePublicId = (product as any).imagePublicId as string | undefined;
   if (data.image != null && data.image.size > 0) {
-    await fs.unlink(`public${product.imagePath}`);
-    imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`;
-    await fs.writeFile(
-      `public${imagePath}`,
-      Buffer.from(await data.image.arrayBuffer())
+    if (imagePublicId) await destroyImage(imagePublicId);
+    const newUpload = await uploadImage(
+      Buffer.from(await data.image.arrayBuffer()),
+      "kingtech/products"
     );
+    imagePath = newUpload.url;
+    imagePublicId = newUpload.public_id;
   }
 
   await db.product.update({
@@ -103,6 +106,7 @@ export async function updateProduct(
       priceInCents: data.priceInCents,
       filePath,
       imagePath,
+      imagePublicId,
     },
   });
 
@@ -123,12 +127,27 @@ export async function toggleProductAvailability(
 }
 
 export async function deleteProduct(id: string) {
+  const existingOrders = await db.order.findMany({
+    where: { productId: id },
+    select: { id: true },
+  });
+  if (existingOrders.length > 0) {
+    throw new Error("Cannot delete a product that has existing orders.");
+  }
+
+  // Manually clean up related records (Mongo has no referential actions)
+  await (db as any).downloadVerification?.deleteMany?.({
+    where: { productId: id },
+  });
+
   const product = await db.product.delete({ where: { id } });
 
   if (product == null) return notFound();
 
   await fs.unlink(product.filePath);
-  await fs.unlink(`public${product.imagePath}`);
+  if ((product as any).imagePublicId) {
+    await destroyImage((product as any).imagePublicId as string);
+  }
 
   revalidatePath("/");
   revalidatePath("/products");

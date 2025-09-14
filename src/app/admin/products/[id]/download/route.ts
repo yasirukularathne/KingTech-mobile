@@ -7,6 +7,9 @@ export async function GET(
   req: NextRequest,
   { params: { id } }: { params: { id: string } }
 ) {
+  const isObjectId = /^[a-f\d]{24}$/i.test(id);
+  if (!isObjectId) return notFound();
+
   const product = await db.product.findUnique({
     where: { id },
     select: { filePath: true, name: true },

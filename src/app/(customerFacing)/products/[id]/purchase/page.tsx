@@ -7,6 +7,9 @@ export default async function PurchasePage({
 }: {
   params: { id: string };
 }) {
+  const isObjectId = /^[a-f\d]{24}$/i.test(id);
+  if (!isObjectId) return notFound();
+
   const product = await db.product.findUnique({ where: { id } });
   if (product == null) return notFound();
 

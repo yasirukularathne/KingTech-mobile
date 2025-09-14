@@ -13,13 +13,20 @@ import { redirect } from "next/navigation";
 import { Product } from "@prisma/client";
 
 async function getProductData() {
-  const [activeCount, inactiveCount, pricing] = await Promise.all([
+  const [activeCount, inactiveCount, prices] = await Promise.all([
     db.product.count({ where: { isAvailableForPurchase: true } }),
     db.product.count({ where: { isAvailableForPurchase: false } }),
-    db.product.aggregate({ _avg: { priceInCents: true } }),
+    db.product.findMany({ select: { priceInCents: true } }),
   ]);
 
-  const avgPriceInCents = pricing._avg.priceInCents || 0;
+  const avgPriceInCents = prices.length
+    ? Math.round(
+        prices.reduce(
+          (sum: number, p: { priceInCents: number }) => sum + p.priceInCents,
+          0
+        ) / prices.length
+      )
+    : 0;
   return { activeCount, inactiveCount, avgPriceInCents };
 }
 
