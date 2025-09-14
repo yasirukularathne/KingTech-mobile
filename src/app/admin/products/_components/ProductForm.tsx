@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/formatters";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { addProduct, updateProduct } from "../../_actions/products";
 import { CategorySelect } from "./CategorySelect";
 import { useFormState, useFormStatus } from "react-dom";
@@ -17,6 +17,7 @@ export function ProductForm({ product }: { product?: Product | null }) {
     product == null ? addProduct : updateProduct.bind(null, product.id),
     {}
   );
+  const errs = (error ?? {}) as Record<string, any>;
   // Store rupee value directly in UI; convert to cents when submitting
   const [priceRupees, setPriceRupees] = useState<number | undefined>(
     product?.priceInCents != null
@@ -24,6 +25,10 @@ export function ProductForm({ product }: { product?: Product | null }) {
       : undefined
   );
   const currencyPreview = formatCurrency(priceRupees || 0);
+  const [fileError, setFileError] = useState<string | undefined>();
+  const [imageError, setImageError] = useState<string | undefined>();
+  const maxFileMB = 3; // keep under serverActions limit + encoding overhead
+  const maxBytes = useMemo(() => maxFileMB * 1024 * 1024, [maxFileMB]);
 
   return (
     <form action={action} className="space-y-10 relative">
@@ -62,9 +67,9 @@ export function ProductForm({ product }: { product?: Product | null }) {
               defaultValue={product?.name || ""}
               className="h-11 rounded-xl bg-white/80 border-gray-200 focus-visible:outline-none focus-visible:ring-0 hover:shadow-sm focus:shadow-md transition-shadow"
             />
-            {error.name && (
+            {errs.name && (
               <div className="text-xs text-red-500 font-medium">
-                {error.name}
+                {errs.name}
               </div>
             )}
           </div>
@@ -97,9 +102,9 @@ export function ProductForm({ product }: { product?: Product | null }) {
                 {currencyPreview}
               </span>
             </div>
-            {error.priceInCents && (
+            {errs.priceInCents && (
               <div className="text-xs text-red-500 font-medium">
-                {error.priceInCents}
+                {errs.priceInCents}
               </div>
             )}
           </div>
@@ -119,9 +124,9 @@ export function ProductForm({ product }: { product?: Product | null }) {
               defaultValue={product?.description}
               className="rounded-xl bg-white/80 border-gray-200 focus-visible:outline-none focus-visible:ring-0 hover:shadow-sm focus:shadow-md transition-shadow resize-y"
             />
-            {error.description && (
+            {errs.description && (
               <div className="text-xs text-red-500 font-medium">
-                {error.description}
+                {errs.description}
               </div>
             )}
           </div>
@@ -131,7 +136,7 @@ export function ProductForm({ product }: { product?: Product | null }) {
             </Label>
             <CategorySelect
               initialValue={product?.category || "Electronics"}
-              error={error.category as string | undefined}
+              error={errs.category as string | undefined}
             />
           </div>
         </div>
@@ -164,15 +169,24 @@ export function ProductForm({ product }: { product?: Product | null }) {
               name="file"
               required={product == null}
               className="rounded-xl bg-white/80 border-gray-200 h-11 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-indigo-600 file:text-white file:text-xs file:font-medium hover:file:bg-indigo-500 focus-visible:outline-none focus-visible:ring-0 hover:shadow-sm focus:shadow-md transition-shadow"
+              onChange={(e) => {
+                setFileError(undefined);
+                const f = e.target.files?.[0];
+                if (!f) return;
+                if (f.size > maxBytes) {
+                  setFileError(`File is too large. Max ${maxFileMB}MB.`);
+                  e.target.value = "";
+                }
+              }}
             />
             {product != null && (
               <div className="text-[11px] text-gray-500 font-medium break-all">
                 {product.filePath}
               </div>
             )}
-            {error.file && (
+            {(fileError || errs.file) && (
               <div className="text-xs text-red-500 font-medium">
-                {error.file}
+                {fileError || errs.file}
               </div>
             )}
           </div>
@@ -189,6 +203,21 @@ export function ProductForm({ product }: { product?: Product | null }) {
               name="image"
               required={product == null}
               className="rounded-xl bg-white/80 border-gray-200 h-11 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-indigo-600 file:text-white file:text-xs file:font-medium hover:file:bg-indigo-500 focus-visible:outline-none focus-visible:ring-0 hover:shadow-sm focus:shadow-md transition-shadow"
+              accept="image/*"
+              onChange={(e) => {
+                setImageError(undefined);
+                const f = e.target.files?.[0];
+                if (!f) return;
+                if (!f.type.startsWith("image/")) {
+                  setImageError("Please select a valid image file.");
+                  e.target.value = "";
+                  return;
+                }
+                if (f.size > maxBytes) {
+                  setImageError(`Image is too large. Max ${maxFileMB}MB.`);
+                  e.target.value = "";
+                }
+              }}
             />
             {product != null && (
               <div className="relative mt-3 w-full max-w-xs overflow-hidden rounded-xl ring-1 ring-gray-200/70 bg-white/50 backdrop-blur">
@@ -204,9 +233,9 @@ export function ProductForm({ product }: { product?: Product | null }) {
                 </span>
               </div>
             )}
-            {error.image && (
+            {(imageError || errs.image) && (
               <div className="text-xs text-red-500 font-medium">
-                {error.image}
+                {imageError || errs.image}
               </div>
             )}
           </div>

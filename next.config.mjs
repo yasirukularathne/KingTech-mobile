@@ -7,6 +7,12 @@ const nextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
+  experimental: {
+    serverActions: {
+      // Keep conservative to stay within Vercel function limits
+      bodySizeLimit: "4mb",
+    },
+  },
 };
 
 export default nextConfig;
