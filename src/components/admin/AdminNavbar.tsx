@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LogOut,
@@ -27,8 +28,15 @@ export function AdminNavbar() {
       />
       <nav className="flex items-center gap-4 overflow-x-auto scrollbar-none rounded-2xl bg-white/60 backdrop-blur-xl px-5 py-1.5 ring-1 ring-gray-200/60 shadow-lg relative">
         <div className="flex items-center gap-3 pr-4 mr-2 border-r border-gray-200/60">
-          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 flex items-center justify-center shadow ring-2 ring-white/60">
-            <LayoutDashboard className="h-5 w-5 text-white drop-shadow" />
+          <div className="h-9 w-9 rounded-full overflow-hidden ring-2 ring-white/60 shadow">
+            <Image
+              src="/KingTechLogo.png"
+              alt="KingTech Logo"
+              width={36}
+              height={36}
+              className="h-9 w-9 object-cover"
+              priority
+            />
           </div>
           <div className="flex flex-col leading-tight">
             <span className="text-lg font-semibold tracking-tight text-gray-900">

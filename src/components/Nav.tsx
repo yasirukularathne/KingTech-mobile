@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ComponentProps, ReactNode } from "react";
 
@@ -17,8 +18,15 @@ export function Nav({ children }: { children: ReactNode }) {
           href="/"
           className="flex items-center gap-3 pr-4 mr-2 border-r border-gray-200/60"
         >
-          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 flex items-center justify-center shadow ring-2 ring-white/60">
-            <span className="text-white text-sm font-bold">KT</span>
+          <div className="h-9 w-9 rounded-full overflow-hidden ring-2 ring-white/60 shadow">
+            <Image
+              src="/KingTechLogo.png"
+              alt="KingTech Logo"
+              width={36}
+              height={36}
+              className="h-9 w-9 object-cover"
+              priority
+            />
           </div>
           <div className="flex flex-col leading-tight">
             <span className="text-lg font-semibold tracking-tight text-gray-900">
