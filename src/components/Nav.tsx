@@ -32,9 +32,6 @@ export function Nav({ children }: { children: ReactNode }) {
             <span className="text-lg font-semibold tracking-tight text-gray-900">
               KingTech
             </span>
-            <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
-              Storefront
-            </span>
           </div>
         </Link>
         <div className="ml-auto flex items-center gap-2">{children}</div>
