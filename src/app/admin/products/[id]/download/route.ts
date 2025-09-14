@@ -1,7 +1,6 @@
 import db from "@/db/db";
 import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
 
 export async function GET(
   req: NextRequest,
@@ -17,14 +16,11 @@ export async function GET(
 
   if (product == null) return notFound();
 
-  const { size } = await fs.stat(product.filePath);
-  const file = await fs.readFile(product.filePath);
   const extension = product.filePath.split(".").pop();
-
-  return new NextResponse(new Uint8Array(file), {
-    headers: {
-      "Content-Disposition": `attachment; filename="${product.name}.${extension}"`,
-      "Content-Length": size.toString(),
-    },
-  });
+  const filename = `${product.name}.${extension}`;
+  // Redirect the client to download directly from Cloudinary (raw resource)
+  // Cloudinary serves proper headers and streaming; avoids serverless FS.
+  return NextResponse.redirect(
+    product.filePath + `?attname=${encodeURIComponent(filename)}`
+  );
 }

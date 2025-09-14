@@ -5,7 +5,12 @@ import { z } from "zod";
 import fs from "fs/promises";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { uploadImage, destroyImage } from "@/lib/cloudinary";
+import {
+  uploadImage,
+  destroyImage,
+  uploadRaw,
+  destroyRaw,
+} from "@/lib/cloudinary";
 
 const fileSchema = z.instanceof(File, { message: "Required" });
 const imageSchema = fileSchema.refine(
@@ -29,9 +34,10 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 
   const data = result.data;
 
-  await fs.mkdir("products", { recursive: true });
-  const filePath = `products/${crypto.randomUUID()}-${data.file.name}`;
-  await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()));
+  const fileBuf = Buffer.from(await data.file.arrayBuffer());
+  const fileUpload = await uploadRaw(fileBuf, "kingtech/files", data.file.name);
+  const filePath = fileUpload.url;
+  const filePublicId = fileUpload.public_id;
 
   // Upload image to Cloudinary
   const imgBuf = Buffer.from(await data.image.arrayBuffer());
@@ -47,6 +53,9 @@ export async function addProduct(prevState: unknown, formData: FormData) {
       category: data.category,
       priceInCents: data.priceInCents,
       filePath,
+      // store Cloudinary public id alongside path for clean deletes
+      // @ts-ignore - schema may not yet have this field; optional in Mongo
+      filePublicId,
       imagePath,
       imagePublicId,
     },
@@ -79,10 +88,16 @@ export async function updateProduct(
   if (product == null) return notFound();
 
   let filePath = product.filePath;
+  let filePublicId = (product as any).filePublicId as string | undefined;
   if (data.file != null && data.file.size > 0) {
-    await fs.unlink(product.filePath);
-    filePath = `products/${crypto.randomUUID()}-${data.file.name}`;
-    await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()));
+    if (filePublicId) await destroyRaw(filePublicId);
+    const newRaw = await uploadRaw(
+      Buffer.from(await data.file.arrayBuffer()),
+      "kingtech/files",
+      data.file.name
+    );
+    filePath = newRaw.url;
+    filePublicId = newRaw.public_id;
   }
 
   let imagePath = product.imagePath;
@@ -105,6 +120,8 @@ export async function updateProduct(
       category: data.category,
       priceInCents: data.priceInCents,
       filePath,
+      // @ts-ignore
+      filePublicId,
       imagePath,
       imagePublicId,
     },
@@ -144,7 +161,10 @@ export async function deleteProduct(id: string) {
 
   if (product == null) return notFound();
 
-  await fs.unlink(product.filePath);
+  // Attempt to clean up stored raw file
+  if ((product as any).filePublicId) {
+    await destroyRaw((product as any).filePublicId as string);
+  }
   if ((product as any).imagePublicId) {
     await destroyImage((product as any).imagePublicId as string);
   }
