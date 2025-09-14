@@ -21,13 +21,17 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 const getMostPopularProducts = cache(
-  () => {
-    return db.product.findMany({
+  async () => {
+    const items = await db.product.findMany({
       where: { isAvailableForPurchase: true },
-      orderBy: { orders: { _count: "desc" } },
-      take: 6,
       include: { _count: { select: { orders: true } } },
+      take: 50,
     });
+    return items
+      .sort(
+        (a: any, b: any) => (b?._count?.orders ?? 0) - (a?._count?.orders ?? 0)
+      )
+      .slice(0, 6);
   },
   ["/", "getMostPopularProducts"],
   { revalidate: 60 * 60 * 24 }
