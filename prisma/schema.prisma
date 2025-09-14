@@ -15,6 +15,7 @@ model Product {
   name                   String
   priceInCents           Int
   filePath               String
+  filePublicId           String?  @default("")
   imagePath              String
   imagePublicId          String?  @default("")
   description            String
