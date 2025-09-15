@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 
 export function PointerHighlight() {
   const pathname = usePathname();
-  if (pathname?.startsWith("/admin")) return null;
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (pathname?.startsWith("/admin")) return;
 
     let x = 0,
       y = 0;
@@ -77,7 +77,9 @@ export function PointerHighlight() {
 
       if (fadeTimer) clearTimeout(fadeTimer);
     };
-  }, []);
+  }, [pathname]);
+
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <div
