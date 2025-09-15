@@ -31,8 +31,8 @@ export function Nav({ children }: { children: ReactNode }) {
           </div>
           <div className="flex flex-col leading-tight">
             <span className="text-lg font-semibold tracking-tight text-gray-900">
-              King{" "}
-              <GoldTech className="ml-0.5 drop-shadow-[0_0_8px_rgba(245,197,24,0.45)]" />
+              King
+              <GoldTech className="drop-shadow-[0_0_8px_rgba(245,197,24,0.45)]" />
             </span>
           </div>
         </Link>
