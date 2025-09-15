@@ -26,7 +26,7 @@ export function Hero() {
       <div className="absolute top-40 right-10 w-96 h-96 bg-gradient-to-r from-purple-400 to-pink-600 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse delay-1000" />
       <div className="absolute -bottom-32 left-1/2 w-80 h-80 bg-gradient-to-r from-indigo-400 to-cyan-600 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse delay-500" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+  <div className="relative w-full text-center">
         {/* Trust Badge */}
         <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/50 px-4 py-2 mb-8 shadow-sm backdrop-blur-sm">
           <div className="flex items-center gap-1">

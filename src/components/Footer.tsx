@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Github, Twitter, Linkedin, Mail } from "lucide-react";
 import { NewsletterForm } from "@/components/footer/NewsletterForm";
+import { GoldTech } from "@/components/GoldTech";
 
 const productLinks = [
   { label: "Phones", href: "/products?category=Phones" },
@@ -50,8 +51,9 @@ export function Footer() {
                   priority
                 />
               </div>
-              <span className="text-xl font-semibold tracking-tight text-white group-hover:text-indigo-300 transition-colors">
-                KingTech
+              <span className="text-xl font-semibold tracking-tight text-white">
+                King{" "}
+                <GoldTech className="ml-0.5 drop-shadow-[0_0_10px_rgba(245,197,24,0.5)]" />
               </span>
             </Link>
             <p className="text-sm leading-relaxed text-gray-400 max-w-sm">

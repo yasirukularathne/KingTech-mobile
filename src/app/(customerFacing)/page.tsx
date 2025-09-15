@@ -125,9 +125,7 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-      <div className="px-4 lg:px-8 pt-2">
-        <Hero />
-      </div>
+      <Hero />
       {/* New Arrivals (moved up just after hero per request) */}
       <section className="pt-10 pb-8">
         <div className="container mx-auto px-4">

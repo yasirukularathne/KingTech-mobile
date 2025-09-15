@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ComponentProps, ReactNode } from "react";
+import { GoldTech } from "@/components/GoldTech";
 
 export function Nav({ children }: { children: ReactNode }) {
   return (
@@ -16,7 +17,7 @@ export function Nav({ children }: { children: ReactNode }) {
       <nav className="flex items-center gap-4 overflow-x-auto scrollbar-none rounded-2xl bg-white/60 backdrop-blur-xl px-5 py-1.5 ring-1 ring-gray-200/60 shadow-lg relative">
         <Link
           href="/"
-          className="flex items-center gap-3 pr-4 mr-2 border-r border-gray-200/60"
+          className="group flex items-center gap-3 pr-4 mr-2 border-r border-gray-200/60"
         >
           <div className="h-9 w-9 rounded-full overflow-hidden ring-2 ring-white/60 shadow">
             <Image
@@ -30,7 +31,8 @@ export function Nav({ children }: { children: ReactNode }) {
           </div>
           <div className="flex flex-col leading-tight">
             <span className="text-lg font-semibold tracking-tight text-gray-900">
-              KingTech
+              King{" "}
+              <GoldTech className="ml-0.5 drop-shadow-[0_0_8px_rgba(245,197,24,0.45)]" />
             </span>
           </div>
         </Link>
