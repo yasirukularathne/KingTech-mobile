@@ -1,7 +1,7 @@
 import NextAuth, { getServerSession, type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-const adminEmails = (process.env.ADMIN_EMAILS || "yasirukularathne1234@gmail.com")
+const adminEmails = (process.env.ADMIN_EMAILS || "")
   .split(",")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);

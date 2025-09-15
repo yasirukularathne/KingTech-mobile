@@ -15,17 +15,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { redirect } from "next/navigation";
 // Dropdown product actions removed (three-dots menu eliminated)
-import { GlassStatusToggle } from "./_components/GlassStatusToggle";
-import { CategoryIcon } from "./_components/CategoryIcon";
-import { InlineDeleteButton } from "./_components/InlineDeleteButton";
+import { GlassStatusToggle } from "../_components/GlassStatusToggle";
+import { CategoryIcon } from "../_components/CategoryIcon";
+import { InlineDeleteButton } from "../_components/InlineDeleteButton";
 import { Suspense } from "react";
 // Dropdown menu components no longer needed after removal of three-dots menu
 
 export default async function AdminProductsPage() {
   const session = await getServerSession(authOptions);
-  const adminEmails = (
-    process.env.ADMIN_EMAILS || "yasirukularathne1234@gmail.com"
-  )
+  const adminEmails = (process.env.ADMIN_EMAILS || "")
     .split(",")
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
