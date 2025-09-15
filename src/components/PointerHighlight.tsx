@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 export function PointerHighlight() {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/admin")) return null;
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
